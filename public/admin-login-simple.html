@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONU Admin Login</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #F36532; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { background: #F36532; color: white; border: none; padding: 12px; width: 100%; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ONU Admin Login</h1>
+        
+        <form action="/api/login" method="post">
+            <input type="hidden" name="role" value="admin">
+            <input type="hidden" name="redirect" value="/dashboard-simple">
+            
+            <label>Username:</label>
+            <input type="text" name="username" value="admin" required>
+            
+            <label>Password:</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+            
+            <button type="submit">Login</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="/mobile-login" style="color: #F36532;">Back to Mobile Login</a>
+        </p>
+    </div>
+</body>
+</html>

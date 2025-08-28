@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Delivery - ONU Parts Tracker</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      height: 100px;
+      margin-bottom: 1rem;
+    }
+    
+    .title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #111;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease;
+    }
+    
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #F36532;
+      box-shadow: 0 0 0 2px rgba(243, 101, 50, 0.2);
+    }
+    
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+    }
+    
+    .products-section {
+      margin-top: 2rem;
+    }
+    
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+      border-bottom: 2px solid #F36532;
+      padding-bottom: 0.5rem;
+    }
+    
+    .products-grid {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .products-grid:last-child {
+      border-bottom: none;
+    }
+    
+    .product-name {
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .quantity-input {
+      width: 80px;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+    
+    .quantity-input:focus {
+      outline: none;
+      border-color: #F36532;
+      box-shadow: 0 0 0 2px rgba(243, 101, 50, 0.2);
+    }
+    
+    .manual-items {
+      margin-top: 1.5rem;
+    }
+    
+    .manual-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #F36532;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      text-decoration: none;
+      text-align: center;
+      margin-right: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .btn:hover {
+      background-color: #e55420;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #F36532;
+      color: #F36532;
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(243, 101, 50, 0.1);
+    }
+    
+    .btn-success {
+      background-color: #059669;
+    }
+    
+    .btn-success:hover {
+      background-color: #047857;
+    }
+    
+    .message {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .message.success {
+      background-color: #d1fae5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+    }
+    
+    .message.error {
+      background-color: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(243, 101, 50, 0.2);
+      border-radius: 50%;
+      border-top-color: #F36532;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .products-grid {
+        grid-template-columns: 2fr 1fr;
+      }
+      
+      .manual-item {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 0 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="/external-logo.png" alt="ONU Logo" class="logo">
+      <h1 class="title">Request Delivery</h1>
+      <p class="subtitle">Submit a request for delivery of office supplies and consumables</p>
+    </div>
+    
+    <div class="card">
+      <div id="success-message" class="message success">
+        <strong>Request Submitted Successfully!</strong><br>
+        Your delivery request has been submitted and will be processed by the facilities team.
+      </div>
+      
+      <div id="error-message" class="message error">
+        <strong>Error:</strong> <span id="error-text">Please try again.</span>
+      </div>
+      
+      <form id="delivery-form">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name" class="form-label">Full Name *</label>
+            <input type="text" id="name" name="name" class="form-input" required placeholder="Enter your full name">
+          </div>
+          
+          <div class="form-group">
+            <label for="room" class="form-label">Room Number *</label>
+            <input type="text" id="room" name="room" class="form-input" required placeholder="e.g., 123, A-204">
+          </div>
+          
+          <div class="form-group">
+            <label for="building" class="form-label">Building *</label>
+            <select id="building" name="building" class="form-select" required>
+              <option value="">-- Select Building --</option>
+              <!-- Buildings will be loaded here -->
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="costCenter" class="form-label">Cost Center *</label>
+            <select id="costCenter" name="costCenter" class="form-select" required>
+              <option value="">-- Select Cost Center --</option>
+              <!-- Cost centers will be loaded here -->
+            </select>
+          </div>
+          
+          <div class="form-group full-width">
+            <label for="notes" class="form-label">Special Instructions or Notes</label>
+            <textarea id="notes" name="notes" class="form-input" rows="3" placeholder="Any special delivery instructions or additional information..."></textarea>
+          </div>
+        </div>
+        
+        <div class="products-section">
+          <h3 class="section-title">Copy Paper</h3>
+          <div id="copy-paper-products">
+            <!-- Copy paper products will be loaded here -->
+          </div>
+          
+          <h3 class="section-title">Toner Cartridges</h3>
+          <div id="toner-products">
+            <!-- Toner products will be loaded here -->
+          </div>
+          
+          <h3 class="section-title">Waste Toner Cartridges</h3>
+          <div id="waste-toner-products">
+            <!-- Waste toner products will be loaded here -->
+          </div>
+          
+          <div class="manual-items">
+            <h3 class="section-title">Additional Items</h3>
+            <p style="margin-bottom: 1rem; color: #666; font-size: 0.875rem;">
+              Use these fields to request items not listed above
+            </p>
+            
+            <div class="manual-item">
+              <div class="form-group">
+                <label class="form-label">Item Description</label>
+                <input type="text" name="manual_item_1" class="form-input" placeholder="Describe the item you need">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="manual_quantity_1" class="quantity-input" min="0" placeholder="0">
+              </div>
+            </div>
+            
+            <div class="manual-item">
+              <div class="form-group">
+                <label class="form-label">Item Description</label>
+                <input type="text" name="manual_item_2" class="form-input" placeholder="Describe the item you need">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="manual_quantity_2" class="quantity-input" min="0" placeholder="0">
+              </div>
+            </div>
+            
+            <div class="manual-item">
+              <div class="form-group">
+                <label class="form-label">Item Description</label>
+                <input type="text" name="manual_item_3" class="form-input" placeholder="Describe the item you need">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Quantity</label>
+                <input type="number" name="manual_quantity_3" class="quantity-input" min="0" placeholder="0">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+          <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 0.5rem;">Submitting request...</p>
+          </div>
+          
+          <button type="submit" id="submit-btn" class="btn">Submit Delivery Request</button>
+          <a href="/login" class="btn btn-outline">Back to Login</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('delivery-form');
+      const buildingSelect = document.getElementById('building');
+      const costCenterSelect = document.getElementById('costCenter');
+      const successMessage = document.getElementById('success-message');
+      const errorMessage = document.getElementById('error-message');
+      const errorText = document.getElementById('error-text');
+      const loading = document.getElementById('loading');
+      const submitBtn = document.getElementById('submit-btn');
+      
+      // Load buildings and cost centers
+      async function loadDropdownData() {
+        try {
+          const [buildingsResponse, costCentersResponse] = await Promise.all([
+            fetch('/api/buildings-public'),
+            fetch('/api/cost-centers-public')
+          ]);
+          
+          if (!buildingsResponse.ok || !costCentersResponse.ok) {
+            throw new Error('Failed to fetch dropdown data');
+          }
+          
+          const buildings = await buildingsResponse.json();
+          const costCenters = await costCentersResponse.json();
+          
+          console.log('Loaded buildings:', buildings.length);
+          console.log('Loaded cost centers:', costCenters.length);
+          
+          // Clear existing options except the first placeholder
+          buildingSelect.innerHTML = '<option value="">-- Select Building --</option>';
+          costCenterSelect.innerHTML = '<option value="">-- Select Cost Center --</option>';
+          
+          // Populate buildings
+          if (Array.isArray(buildings)) {
+            buildings.forEach(building => {
+              const option = document.createElement('option');
+              option.value = building.id;
+              option.textContent = building.name;
+              buildingSelect.appendChild(option);
+            });
+            console.log('Populated', buildings.length, 'buildings');
+          }
+          
+          // Populate cost centers
+          if (Array.isArray(costCenters)) {
+            costCenters.forEach(center => {
+              const option = document.createElement('option');
+              option.value = center.id;
+              option.textContent = `${center.code} - ${center.name}`;
+              costCenterSelect.appendChild(option);
+            });
+            console.log('Populated', costCenters.length, 'cost centers');
+          }
+        } catch (error) {
+          console.error('Error loading dropdown data:', error);
+          // Show user-friendly error
+          buildingSelect.innerHTML = '<option value="">Error loading buildings</option>';
+          costCenterSelect.innerHTML = '<option value="">Error loading cost centers</option>';
+        }
+      }
+      
+      // Load delivery products
+      async function loadDeliveryProducts() {
+        try {
+          const response = await fetch('/api/delivery-products');
+          const products = await response.json();
+          
+          const copyPaperContainer = document.getElementById('copy-paper-products');
+          const tonerContainer = document.getElementById('toner-products');
+          const wasteTonerContainer = document.getElementById('waste-toner-products');
+          
+          // Clear containers
+          copyPaperContainer.innerHTML = '';
+          tonerContainer.innerHTML = '';
+          wasteTonerContainer.innerHTML = '';
+          
+          products.forEach(product => {
+            const productDiv = document.createElement('div');
+            productDiv.className = 'products-grid';
+            productDiv.innerHTML = `
+              <div class="product-name">${product.name}</div>
+              <input type="number" name="product_${product.part_id}" class="quantity-input" min="0" placeholder="0">
+            `;
+            
+            if (product.category === 'copy_paper') {
+              copyPaperContainer.appendChild(productDiv);
+            } else if (product.category === 'toner') {
+              tonerContainer.appendChild(productDiv);
+            } else if (product.category === 'waste_toner') {
+              wasteTonerContainer.appendChild(productDiv);
+            }
+          });
+          
+          // Add "No items available" message if categories are empty
+          if (copyPaperContainer.innerHTML === '') {
+            copyPaperContainer.innerHTML = '<p style="color: #666; font-style: italic;">No copy paper items available</p>';
+          }
+          if (tonerContainer.innerHTML === '') {
+            tonerContainer.innerHTML = '<p style="color: #666; font-style: italic;">No toner cartridges available</p>';
+          }
+          if (wasteTonerContainer.innerHTML === '') {
+            wasteTonerContainer.innerHTML = '<p style="color: #666; font-style: italic;">No waste toner cartridges available</p>';
+          }
+        } catch (error) {
+          console.error('Error loading delivery products:', error);
+        }
+      }
+      
+      // Handle form submission
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Hide messages
+        successMessage.style.display = 'none';
+        errorMessage.style.display = 'none';
+        
+        // Show loading
+        loading.style.display = 'block';
+        submitBtn.disabled = true;
+        
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          // Validate required fields
+          if (!data.name || !data.room || !data.building || !data.costCenter) {
+            throw new Error('Please fill in all required fields');
+          }
+          
+          // Check if at least one item has a quantity > 0
+          const hasItems = Object.keys(data).some(key => {
+            return (key.startsWith('product_') || key.startsWith('manual_quantity_')) && 
+                   parseInt(data[key]) > 0;
+          }) || Object.keys(data).some(key => {
+            return key.startsWith('manual_item_') && data[key].trim() !== '';
+          });
+          
+          if (!hasItems) {
+            throw new Error('Please specify at least one item with a quantity greater than 0');
+          }
+          
+          const response = await fetch('/api/delivery-request', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(errorData || 'Failed to submit request');
+          }
+          
+          // Success
+          successMessage.style.display = 'block';
+          form.reset();
+          
+          // Scroll to top to show success message
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+        } catch (error) {
+          errorText.textContent = error.message;
+          errorMessage.style.display = 'block';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } finally {
+          loading.style.display = 'none';
+          submitBtn.disabled = false;
+        }
+      });
+      
+      // Initialize
+      loadDropdownData();
+      loadDeliveryProducts();
+    });
+  </script>
+</body>
+</html>

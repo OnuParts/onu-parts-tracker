@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#F36532">
+  <title>Mobile App</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <style>
+    /* Base styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-touch-callout: none;
+    }
+    
+    html {
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      /* Bottom navigation removed, so removed extra padding */
+      color: #333;
+      background-color: #f5f5f5;
+      padding-bottom: 20px;
+      min-height: 100%;
+      width: 100%;
+      position: relative;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Header */
+    .header {
+      background-color: #F36532;
+      color: white;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-height: 65px;
+    }
+    
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap;
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+    
+    .container {
+      padding: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    h1, h2 {
+      margin-bottom: 15px;
+    }
+    
+    /* Form styles */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px; /* Prevents iOS auto-zoom on focus */
+      -webkit-appearance: none; /* Removes default styling on iOS */
+      appearance: none;
+      background-color: white;
+    }
+    
+    /* Custom styling for select elements */
+    select {
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+    
+    /* Focus states for better usability */
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #F36532;
+      box-shadow: 0 0 0 3px rgba(243, 101, 50, 0.2);
+    }
+    
+    .btn {
+      background-color: #F36532;
+      color: white;
+      border: none;
+      padding: 16px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+      font-weight: 600;
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+      transition: transform 0.1s, background-color 0.2s;
+      box-shadow: 0 2px 4px rgba(243, 101, 50, 0.2);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: #F36532;
+      border: 2px solid #F36532;
+    }
+    
+    .btn:hover {
+      opacity: 0.95;
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(243, 101, 50, 0.2);
+    }
+    
+    /* Improve tap targets for mobile */
+    .btn, .tab, .logout-btn {
+      min-height: 44px; /* Minimum height for touch targets */
+    }
+    
+    /* Login form */
+    .login-form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    /* Button group */
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    /* Lists */
+    .parts-list {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    
+    .parts-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .parts-item:last-child {
+      border-bottom: none;
+    }
+    
+    .part-name {
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    
+    .part-details {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .part-quantity {
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    
+    .quantity-available {
+      color: #2a9d49;
+    }
+    
+    .quantity-low {
+      color: #d97706;
+    }
+    
+    .quantity-empty {
+      color: #dc2626;
+    }
+    
+    .issue-form {
+      display: none;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: #F36532;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 30px;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(243, 101, 50, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #F36532;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .error {
+      color: #dc2626;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    
+    .logout-btn {
+      background: #d12800; /* Much darker for high contrast */
+      border: 2px solid #ffffff;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 6px;
+      -webkit-tap-highlight-color: transparent;
+      min-width: 100px;
+      max-width: 200px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 10px;
+      height: 44px; /* Fixed height for mobile */
+    }
+    
+    .logout-btn:active {
+      background: #b01e00;
+      transform: translateY(2px);
+    }
+    
+    .user-info {
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      flex-grow: 0;
+      flex-shrink: 1;
+      max-width: 35%;
+      min-width: 0;
+    }
+    
+    /* Media query for very small screens */
+    @media (max-width: 360px) {
+      .user-info {
+        max-width: 100px;
+        font-size: 0.8rem;
+        padding: 4px 8px;
+      }
+      
+      .logout-btn {
+        min-width: 80px;
+        font-size: 1rem;
+        padding: 8px 12px;
+      }
+    }
+    
+    .recent-issuance {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    
+    .recent-issuance table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .recent-issuance th {
+      text-align: left;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-weight: 500;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .recent-issuance td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    
+    .recent-issuance tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* Active tab/button highlight */
+    .active-button {
+      background-color: white;
+      color: #F36532;
+      border: 2px solid #F36532;
+      font-weight: bold;
+    }
+    
+    /* Debug info section */
+    .debug-info {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px dashed #ccc;
+      background-color: #f9f9f9;
+      font-family: monospace;
+      font-size: 12px;
+      display: none;
+    }
+    
+    /* Tab system removed as per user's request */
+    
+    /* Styles for multi-part selection */
+    .selected-parts-container {
+      margin-bottom: 15px;
+    }
+    
+    .selected-part-item {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    .part-details-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .remove-part {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(220, 38, 38, 0.1);
+      color: #dc2626;
+      border: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .btn-small {
+      background-color: #F36532;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .alert {
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    
+    .success {
+      background-color: rgba(42, 157, 73, 0.1);
+      color: #2a9d49;
+      border: 1px solid rgba(42, 157, 73, 0.2);
+    }
+    
+    .warning {
+      background-color: rgba(217, 119, 6, 0.1);
+      color: #d97706;
+      border: 1px solid rgba(217, 119, 6, 0.2);
+    }
+    
+    .error-alert {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: #dc2626;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+    
+    .success-message {
+      background-color: rgba(42, 157, 73, 0.1);
+      color: #2a9d49;
+      border: 1px solid rgba(42, 157, 73, 0.2);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .btn-secondary {
+      background-color: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    
+    /* Admin Quick Links */
+    .admin-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .admin-link {
+      background-color: #f36532;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+    
+    .admin-link:hover, .admin-link:focus {
+      background-color: #e55420;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(243, 101, 50, 0.3);
+    }
+    
+    /* Admin Dashboard Styles */
+    .admin-header {
+      background-color: #f36532;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .admin-header h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+    
+    .admin-message {
+      margin: 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .admin-footer {
+      margin-top: 20px;
+      background-color: #f8f8f8;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #666;
+      border-left: 4px solid #f36532;
+    }
+    
+    .admin-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .nav-group {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 10px;
+    }
+    
+    .nav-group h3 {
+      margin-top: 0;
+      color: #f36532;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .admin-nav-item {
+      display: block;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      background-color: #f8f8f8;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+      font-weight: 500;
+    }
+    
+    .admin-nav-item:hover {
+      background-color: #f5f0ec;
+      border-left-color: #f36532;
+      color: #f36532;
+    }
+    
+    .admin-nav-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .helper-text {
+      font-size: 0.8rem;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    
+    .mobile-only {
+      border-left: 3px solid #f36532;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="height: 30px; margin: 0;">
+      <img src="/external-logo.png" alt="Logo" style="height: 100%;" />
+    </div>
+    <div class="header-right">
+      <div class="user-info" id="user-name"></div>
+      <button class="logout-btn" type="button" id="logout-button" style="display: none;">LOGOUT</button>
+    </div>
+  </div>
+  
+  <!-- Fixed Admin Navigation Bar (visible when user is admin) -->
+  <div id="admin-navigation-bar" style="display: none; background-color: #f36532; overflow-x: auto; white-space: nowrap; padding: 10px 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="display: flex; gap: 8px; justify-content: space-between; padding: 0 5px;">
+      <a href="/dashboard" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.2); text-align: center; min-width: 40px; font-weight: bold; font-size: 0.85rem;">Home</a>
+      <a href="/parts-inventory" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.2); text-align: center; min-width: 40px; font-weight: bold; font-size: 0.85rem;">Inventory</a>
+      <a href="/dashboard" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.2); text-align: center; min-width: 40px; font-weight: bold; font-size: 0.85rem;">Issuance</a>
+      <a href="/reports" style="color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; background-color: rgba(255,255,255,0.2); text-align: center; min-width: 40px; font-weight: bold; font-size: 0.85rem;">Reports</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Login Form -->
+    <div id="login-section" class="login-form">
+      <h2>Technician Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="technician-select">Select Technician</label>
+          <select id="technician-select" name="technicianId">
+            <option value="">Select your name</option>
+            <!-- Technicians will be loaded here -->
+          </select>
+        </div>
+        <div id="manual-login-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+          <h3>Or Login Manually</h3>
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name">
+          </div>
+          <div class="form-group">
+            <label for="department">Department</label>
+            <input type="text" id="department" name="department" placeholder="Optional - Department">
+          </div>
+        </div>
+        <div id="admin-login-section" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+          <h3>Administrator Login</h3>
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Admin username">
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Admin password">
+          </div>
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+    </div>
+
+    <!-- Admin Dashboard (initially hidden) -->
+    <div id="admin-dashboard" style="display: none;">
+      <div class="admin-header">
+        <h2>Admin Dashboard Control Panel</h2>
+        <p class="admin-message">Welcome to the administrator interface. Use the links below to access the full dashboard.</p>
+      </div>
+      
+      <div class="admin-nav">
+        <div class="nav-group">
+          <h3>Inventory Management</h3>
+          <a href="/dashboard" class="admin-nav-item">
+            <strong>Main Dashboard</strong>
+          </a>
+          <a href="/parts-inventory" class="admin-nav-item">Parts Inventory</a>
+          <a href="/dashboard" class="admin-nav-item">Parts Issuance</a>
+          <a href="/reports" class="admin-nav-item">Reports</a>
+        </div>
+        
+        <div class="nav-group">
+          <h3>System Management</h3>
+          <a href="/technicians" class="admin-nav-item">Technicians</a>
+          <a href="/buildings" class="admin-nav-item">Buildings</a>
+          <a href="/settings" class="admin-nav-item">Settings</a>
+        </div>
+        
+        <div class="nav-group mobile-only">
+          <h3>Mobile Functions</h3>
+          <a href="#" class="admin-nav-item" id="show-mobile-issuance">Access Mobile Parts Issuance Interface</a>
+          <p class="helper-text">Click above if you need to use the mobile parts issuance interface (normally for technicians only)</p>
+        </div>
+      </div>
+      
+      <div class="admin-footer">
+        <p>For Excel exports and imports, please use the main dashboard interface.</p>
+      </div>
+    </div>
+
+    <!-- Main Content (initially hidden) -->
+    <div id="main-content" style="display: none;">
+      <!-- Admin Quick Links (hidden by default, shown for admin users) -->
+      <div id="admin-quick-links" style="display: none; margin-bottom: 20px;">
+        <h3>Admin Dashboard Access</h3>
+        <div class="admin-links">
+          <a href="/dashboard" class="admin-link">Dashboard</a>
+          <a href="/parts-inventory" class="admin-link">Inventory</a>
+          <a href="/dashboard" class="admin-link">Issuance</a>
+        </div>
+        <div class="admin-links" style="margin-top: 10px;">
+          <a href="/reports" class="admin-link">Reports</a>
+          <a href="/technicians" class="admin-link">Technicians</a>
+          <a href="/settings" class="admin-link">Settings</a>
+        </div>
+      </div>
+      
+      <!-- Issue Parts Form -->
+      <div id="issue-parts-tab">
+        <h2>Issue Parts</h2>
+        <form id="part-issue-form">
+          <div class="form-group">
+            <label>Parts to Issue</label>
+            <div id="selected-parts-container" class="selected-parts-container"></div>
+            <div id="add-part-container">
+              <div style="margin-bottom: 10px;">
+                <input type="text" id="part-search" name="partSearch" placeholder="Search parts by name or ID" style="width: 100%;">
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <div style="flex: 3;">
+                  <select id="part-select" name="partId">
+                    <option value="">Select part</option>
+                  </select>
+                </div>
+                <div style="flex: 1;">
+                  <input type="number" id="quantity-input" name="quantity" min="1" value="1" placeholder="Qty">
+                </div>
+                <div style="flex: 0 0 auto;">
+                  <button type="button" id="add-part-btn" class="btn-small">+Add</button>
+                </div>
+              </div>
+            </div>
+            <div id="part-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="building-select">Building</label>
+            <select id="building-select" name="building" required>
+              <option value="">Select building</option>
+            </select>
+            <div id="building-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="issued-to-select">Issued To</label>
+            <select id="issued-to-select" name="issuedTo" required>
+              <option value="">Select person</option>
+            </select>
+            <div id="issued-to-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="cost-center-input">Cost Center</label>
+            <input type="text" id="cost-center-input" name="costCenter" placeholder="Optional - Cost Center">
+          </div>
+          <div class="form-group">
+            <label for="notes-input">Notes</label>
+            <input type="text" id="notes-input" name="notes" placeholder="Optional - Notes">
+          </div>
+          <button type="submit" class="btn">Submit</button>
+        </form>
+      </div>
+      
+      <!-- Debug Info (hidden by default) -->
+      <div id="debug-info" class="debug-info"></div>
+    </div>
+  </div>
+
+  <script>
+    // Variables to store data
+    let currentUser = null;
+    let parts = [];
+    let buildings = [];
+    let technicians = [];
+    let recentIssuance = [];
+    let debugMode = false;
+    // Array to store selected parts for multi-part issuance
+    let selectedParts = [];
+
+    // Debug logging helper
+    function logDebug(message, data = null) {
+      if (!debugMode) return;
+      
+      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+      let logMsg = `[${timestamp}] ${message}`;
+      
+      if (data) {
+        console.log(logMsg, data);
+        logMsg += ` ${JSON.stringify(data)}`;
+      } else {
+        console.log(logMsg);
+      }
+      
+      const debugElement = document.getElementById('debug-info');
+      debugElement.style.display = 'block';
+      debugElement.innerHTML += `<div>${logMsg}</div>`;
+    }
+
+    // Removed tab system as it's not needed per user's request
+
+    // Check if user is already authenticated
+    async function checkAuth() {
+      try {
+        logDebug('Checking authentication status');
+        const response = await fetch('/api/current-user');
+        
+        if (response.ok) {
+          currentUser = await response.json();
+          document.getElementById('user-name').textContent = currentUser.name;
+          logDebug('User is authenticated', currentUser);
+          return true;
+        } else {
+          logDebug('User is not authenticated');
+          return false;
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        logDebug('Authentication check failed', error.message);
+        return false;
+      }
+    }
+    
+    // Load technicians for the login dropdown
+    async function loadTechniciansForLogin() {
+      logDebug('Loading technicians for login dropdown');
+      const technicianSelect = document.getElementById('technician-select');
+      
+      // Clear previous options except the default
+      technicianSelect.innerHTML = '<option value="">Select your name</option>';
+      
+      try {
+        const response = await fetch('/api/technicians-list');
+        
+        if (response.ok) {
+          const techData = await response.json();
+          logDebug(`Loaded ${techData.length} technicians for login dropdown`);
+          
+          // Sort technicians by name
+          techData.sort((a, b) => a.name.localeCompare(b.name));
+          
+          // Add technicians to the dropdown
+          techData.forEach(tech => {
+            const option = document.createElement('option');
+            option.value = tech.id || tech.name;  // Use ID if available, fallback to name
+            option.textContent = tech.name + (tech.department ? ` - ${tech.department}` : '');
+            technicianSelect.appendChild(option);
+          });
+        } else {
+          logDebug('Failed to load technicians for login dropdown', response.status);
+          const option = document.createElement('option');
+          option.disabled = true;
+          option.textContent = '-- Error loading technicians --';
+          technicianSelect.appendChild(option);
+        }
+      } catch (error) {
+        console.error('Error loading technicians for login:', error);
+        logDebug('Error loading technicians for login', error.message);
+        const option = document.createElement('option');
+        option.disabled = true;
+        option.textContent = '-- Error loading technicians --';
+        technicianSelect.appendChild(option);
+      }
+    }
+    
+    // Initialize page
+    async function initPage() {
+      logDebug('Initializing page');
+      
+      const isAuthenticated = await checkAuth();
+      
+      if (isAuthenticated) {
+        // User is authenticated
+        document.getElementById('login-section').style.display = 'none';
+        
+        // Always show the navigation bar for admin users
+        if (currentUser && currentUser.role === 'admin') {
+          document.getElementById('admin-navigation-bar').style.display = 'block';
+        } else {
+          document.getElementById('admin-navigation-bar').style.display = 'none';
+        }
+        
+        // Show different content based on user role
+        if (currentUser && currentUser.role === 'admin') {
+          // For admins, show admin dashboard only
+          document.getElementById('admin-dashboard').style.display = 'block';
+          document.getElementById('main-content').style.display = 'none';
+          logDebug('Showing admin dashboard view');
+        } else {
+          // For technicians, show parts issuance interface
+          document.getElementById('main-content').style.display = 'block';
+          logDebug('Showing technician parts issuance view');
+        }
+        
+        fetchData();
+        
+        // Show logout button with explicit styling to ensure visibility
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.style.display = 'flex';
+        logoutButton.style.visibility = 'visible';
+        
+        // Show the bottom navigation for all authenticated users
+        initBottomNavigation();
+      } else {
+        // User is not authenticated, show login form, hide logout button
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('logout-button').style.display = 'none';
+        
+        // Load technicians for the login dropdown
+        loadTechniciansForLogin();
+      }
+      
+      // Enable debug mode with shift+D
+      document.addEventListener('keydown', function(event) {
+        if (event.shiftKey && event.key === 'D') {
+          debugMode = !debugMode;
+          document.getElementById('debug-info').style.display = debugMode ? 'block' : 'none';
+          if (debugMode) {
+            logDebug('Debug mode enabled');
+          }
+        }
+      });
+    }
+    
+    // Fetch data from API
+    async function fetchData() {
+      try {
+        logDebug('Fetching initial data');
+        
+        // Load parts
+        await loadParts();
+        
+        // Load buildings
+        await loadBuildings();
+        
+        // Load technicians for the issued-to dropdown
+        await loadTechnicians();
+        
+        logDebug('Initial data loaded successfully');
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+        logDebug('Failed to fetch initial data', error.message);
+      }
+    }
+    
+    // Load parts data
+    async function loadParts() {
+      try {
+        logDebug('Loading parts');
+        const partsResponse = await fetch('/api/parts');
+        
+        if (partsResponse.ok) {
+          parts = await partsResponse.json();
+          logDebug(`Loaded ${parts.length} parts`);
+          populatePartSelect();
+          return true;
+        } else {
+          logDebug('Failed to load parts', partsResponse.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading parts:', error);
+        logDebug('Error loading parts', error.message);
+        return false;
+      }
+    }
+    
+    // Load buildings data
+    async function loadBuildings() {
+      try {
+        logDebug('Loading buildings');
+        const buildingsResponse = await fetch('/api/buildings');
+        
+        if (buildingsResponse.ok) {
+          buildings = await buildingsResponse.json();
+          logDebug(`Loaded ${buildings.length} buildings`);
+          populateBuildingSelect();
+          return true;
+        } else {
+          logDebug('Failed to load buildings', buildingsResponse.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading buildings:', error);
+        logDebug('Error loading buildings', error.message);
+        return false;
+      }
+    }
+    
+    // Load technicians data
+    async function loadTechnicians() {
+      try {
+        logDebug('Loading technicians');
+        
+        const techniciansResponse = await fetch('/api/technicians-list');
+        
+        if (techniciansResponse.ok) {
+          technicians = await techniciansResponse.json();
+          logDebug(`Loaded ${technicians.length} technicians`);
+          
+          // Update UI with technician data for the dropdown
+          populateTechnicianSelect();
+          return true;
+        } else {
+          logDebug('Failed to load technicians', techniciansResponse.status);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error loading technicians:', error);
+        logDebug('Error loading technicians', error.message);
+        return false;
+      }
+    }
+    
+    // Recent issuance functions removed since they're no longer needed
+    
+    // Populate part select dropdown with optional search term
+    function populatePartSelect(searchTerm = '') {
+      const select = document.getElementById('part-select');
+      select.innerHTML = '<option value="">Select part</option>';
+      
+      // Sort parts by name
+      parts.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Convert search term to lowercase for case-insensitive matching
+      const search = searchTerm.toLowerCase();
+      
+      // Filter parts based on search term if provided
+      const filteredParts = search 
+        ? parts.filter(part => 
+            part.quantity > 0 && (
+              part.name.toLowerCase().includes(search) || 
+              part.partId.toLowerCase().includes(search) ||
+              (part.description && part.description.toLowerCase().includes(search))
+            )
+          )
+        : parts.filter(part => part.quantity > 0);
+      
+      filteredParts.forEach(part => {
+        const option = document.createElement('option');
+        option.value = part.id;
+        option.textContent = `${part.name} - ${part.partId} (${part.quantity} available)`;
+        select.appendChild(option);
+      });
+      
+      logDebug(`Populated parts dropdown with ${filteredParts.length} available parts out of ${parts.filter(p => p.quantity > 0).length} total`);
+      
+      // Enable or disable the select based on search results
+      if (filteredParts.length === 0 && search) {
+        select.disabled = true;
+        document.getElementById('part-error').textContent = `No parts found matching "${searchTerm}"`;
+      } else {
+        select.disabled = false;
+        document.getElementById('part-error').textContent = '';
+      }
+    }
+    
+    // Add event listener for the search input
+    document.getElementById('part-search').addEventListener('input', function() {
+      populatePartSelect(this.value);
+    });
+    
+    // Populate building select dropdown
+    function populateBuildingSelect() {
+      const select = document.getElementById('building-select');
+      select.innerHTML = '<option value="">Select building</option>';
+      
+      buildings.forEach(building => {
+        const option = document.createElement('option');
+        option.value = building.name;
+        option.textContent = building.name;
+        select.appendChild(option);
+      });
+      
+      // Add 'Other' option if no buildings
+      if (buildings.length === 0) {
+        const option = document.createElement('option');
+        option.value = 'Other';
+        option.textContent = 'Other';
+        select.appendChild(option);
+      }
+      
+      logDebug(`Populated buildings dropdown with ${buildings.length} buildings`);
+    }
+    
+    // Populate technician select dropdown
+    function populateTechnicianSelect() {
+      const select = document.getElementById('issued-to-select');
+      select.innerHTML = '<option value="">Select person</option>';
+      
+      // Add current user as first option
+      if (currentUser) {
+        const option = document.createElement('option');
+        option.value = currentUser.name;
+        option.textContent = `${currentUser.name} (You)`;
+        select.appendChild(option);
+        
+        // Set current user as default selected
+        select.value = currentUser.name;
+      }
+      
+      // Add other technicians
+      technicians.forEach(tech => {
+        if (!currentUser || tech.name !== currentUser.name) {
+          const option = document.createElement('option');
+          option.value = tech.name;
+          option.textContent = `${tech.name}${tech.department ? ` - ${tech.department}` : ''}`;
+          select.appendChild(option);
+        }
+      });
+      
+      logDebug(`Populated technicians dropdown with ${technicians.length} technicians`);
+    }
+    
+    // Render functions removed since they're no longer needed with the tab system removed
+    
+    // Handle login form submission
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const technicianSelect = document.getElementById('technician-select');
+      const manualName = document.getElementById('name').value.trim();
+      const department = document.getElementById('department').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      
+      // Check login method: admin, technician from dropdown, or manual entry
+      let loginPayload = {};
+      
+      // Admin login takes precedence if both username and password are provided
+      if (username && password) {
+        loginPayload = {
+          username: username,
+          password: password,
+          role: 'admin'
+        };
+        
+        logDebug('Submitting login form with admin credentials', { username });
+      } else if (technicianSelect.value) {
+        // Get the selected option's text (name)
+        const selectedOption = technicianSelect.options[technicianSelect.selectedIndex];
+        const techName = selectedOption.textContent.split(' - ')[0]; // Extract name part before department
+        
+        loginPayload = {
+          technicianId: technicianSelect.value,
+          name: techName,
+          role: 'technician'
+        };
+        
+        logDebug('Submitting login form with selected technician', loginPayload);
+      } else if (manualName) {
+        loginPayload = {
+          name: manualName,
+          department: department,
+          role: 'technician'
+        };
+        
+        logDebug('Submitting login form with manual entry', loginPayload);
+      } else {
+        alert('Please enter admin credentials, select a technician, or enter your name');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginPayload)
+        });
+        
+        if (response.ok) {
+          currentUser = await response.json();
+          document.getElementById('user-name').textContent = currentUser.name;
+          logDebug('Login successful', currentUser);
+          
+          // Hide login section for all users
+          document.getElementById('login-section').style.display = 'none';
+          
+          // For admin users, show admin dashboard instead of parts issuance
+          if (currentUser.role === 'admin') {
+            logDebug('Admin user detected, providing full dashboard access');
+            
+            // Show admin dashboard section ONLY for admins
+            document.getElementById('admin-dashboard').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+            
+            // Show the admin navigation bar
+            document.getElementById('admin-navigation-bar').style.display = 'block';
+          } else {
+            // For technicians, show parts issuance interface
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            
+            // Hide the admin navigation bar
+            document.getElementById('admin-navigation-bar').style.display = 'none';
+          }
+          
+          // Show logout button (explicitly set display style)
+          const logoutButton = document.getElementById('logout-button');
+          logoutButton.style.display = 'flex';
+          logoutButton.style.visibility = 'visible';
+          
+          // Show the bottom navigation for all users
+          initBottomNavigation();
+          
+          // Fetch data
+          fetchData();
+        } else {
+          let errorMessage = 'Login failed';
+          
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || 'Unknown error';
+          } catch (e) {
+            // If response isn't JSON
+            errorMessage = `Server returned status ${response.status}`;
+          }
+          
+          logDebug('Login failed', errorMessage);
+          alert(`Login failed: ${errorMessage}`);
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        logDebug('Login error', error.message);
+        alert('Failed to login. Please try again.');
+      }
+    });
+    
+    // Clear form errors
+    function clearFormErrors() {
+      const errorElements = document.querySelectorAll('.error');
+      errorElements.forEach(el => el.textContent = '');
+    }
+    
+    // Handle issue form submission
+    // Add a new part to the selected parts list
+    function addSelectedPart() {
+      const partId = parseInt(document.getElementById('part-select').value);
+      const quantity = parseInt(document.getElementById('quantity-input').value);
+      
+      // Basic validation
+      if (!partId) {
+        document.getElementById('part-error').textContent = 'Please select a part';
+        return;
+      }
+      
+      if (!quantity || quantity < 1) {
+        document.getElementById('part-error').textContent = 'Quantity must be at least 1';
+        return;
+      }
+      
+      // Find the selected part
+      const part = parts.find(p => p.id === partId);
+      if (!part) {
+        document.getElementById('part-error').textContent = 'Part not found';
+        return;
+      }
+      
+      // Check if quantity is available
+      if (quantity > part.quantity) {
+        document.getElementById('part-error').textContent = `Cannot issue more than available quantity (${part.quantity})`;
+        return;
+      }
+      
+      // Check if part is already in the list and update quantity instead
+      const existingIndex = selectedParts.findIndex(p => p.id === partId);
+      if (existingIndex !== -1) {
+        const existing = selectedParts[existingIndex];
+        const newQuantity = existing.quantity + quantity;
+        
+        // Check if total quantity exceeds available amount
+        if (newQuantity > part.quantity) {
+          document.getElementById('part-error').textContent = `Total quantity (${newQuantity}) exceeds available quantity (${part.quantity})`;
+          return;
+        }
+        
+        // Update quantity
+        selectedParts[existingIndex].quantity = newQuantity;
+      } else {
+        // Add new part to the list
+        selectedParts.push({
+          id: part.id,
+          partId: part.partId,
+          name: part.name,
+          quantity: quantity,
+          availableQuantity: part.quantity
+        });
+      }
+      
+      // Clear the part form
+      document.getElementById('part-select').value = '';
+      document.getElementById('quantity-input').value = '1';
+      document.getElementById('part-error').textContent = '';
+      
+      // Update the UI
+      updateSelectedPartsUI();
+      
+      logDebug('Added part to selected list', selectedParts);
+    }
+    
+    // Remove a part from the selected parts list
+    function removeSelectedPart(index) {
+      if (index >= 0 && index < selectedParts.length) {
+        selectedParts.splice(index, 1);
+        updateSelectedPartsUI();
+        logDebug('Removed part from selected list', selectedParts);
+      }
+    }
+    
+    // Update the UI with the selected parts
+    function updateSelectedPartsUI() {
+      const container = document.getElementById('selected-parts-container');
+      container.innerHTML = '';
+      
+      if (selectedParts.length === 0) {
+        container.innerHTML = '<div class="alert warning">No parts selected. Add parts to issue using the form below.</div>';
+        return;
+      }
+      
+      selectedParts.forEach((part, index) => {
+        const partElement = document.createElement('div');
+        partElement.className = 'selected-part-item';
+        partElement.innerHTML = `
+          <button type="button" class="remove-part" data-index="${index}">&times;</button>
+          <div class="part-details-flex">
+            <div>
+              <strong>${part.name}</strong><br>
+              <small>Part ID: ${part.partId}</small>
+            </div>
+            <div>
+              <strong>Qty: ${part.quantity}</strong><br>
+              <small>(${part.availableQuantity} available)</small>
+            </div>
+          </div>
+        `;
+        container.appendChild(partElement);
+      });
+      
+      // Add event listeners to remove buttons
+      document.querySelectorAll('.remove-part').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          removeSelectedPart(index);
+        });
+      });
+    }
+    
+    // Add event listener to the add part button
+    document.getElementById('add-part-btn').addEventListener('click', addSelectedPart);
+    
+    // Handle submission of the parts issuance form
+    document.getElementById('part-issue-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearFormErrors();
+      
+      // Validate that we have selected parts
+      if (selectedParts.length === 0) {
+        document.getElementById('part-error').textContent = 'Please add at least one part to issue';
+        return;
+      }
+      
+      // Validate common form fields
+      const building = document.getElementById('building-select').value;
+      const issuedTo = document.getElementById('issued-to-select').value;
+      const costCenter = document.getElementById('cost-center-input').value;
+      const notes = document.getElementById('notes-input').value;
+      
+      let isValid = true;
+      
+      if (!building) {
+        document.getElementById('building-error').textContent = 'Please select a building';
+        isValid = false;
+      }
+      
+      if (!issuedTo) {
+        document.getElementById('issued-to-error').textContent = 'Please select a person';
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        return;
+      }
+      
+      // Create an array of issuance requests
+      const requests = selectedParts.map(part => {
+        return {
+          partId: part.id,
+          quantity: part.quantity,
+          reason: 'maintenance', // Set explicit reason value
+          building, // Send building name as its own field
+          projectCode: costCenter || building, // Use cost center if available, otherwise building name
+          issuedTo,
+          department: building, // Store building name in department
+          costCenter: costCenter || null,
+          notes: notes || null,
+          name: part.name // Include part name for error reporting
+        };
+      });
+      
+      logDebug('Submitting multiple parts issuance', requests);
+      
+      // Track success and failure
+      let successCount = 0;
+      let failureCount = 0;
+      let errors = [];
+      
+      try {
+        // Process each request
+        for (const request of requests) {
+          try {
+            const response = await fetch('/api/parts-issuance', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(request)
+            });
+            
+            if (response.ok) {
+              successCount++;
+            } else {
+              const errorData = await response.json();
+              failureCount++;
+              errors.push(`${request.name}: ${errorData.error || 'Unknown error'}`);
+              logDebug('Parts issuance failed', errorData);
+            }
+          } catch (error) {
+            failureCount++;
+            errors.push(`${request.name}: ${error.message}`);
+            logDebug('Parts issuance error', error.message);
+          }
+        }
+        
+        // Refresh parts data (to update quantities)
+        await loadParts();
+        
+        // Reset form and show results
+        if (successCount > 0) {
+          // Clear the form and selected parts
+          document.getElementById('part-issue-form').reset();
+          selectedParts = [];
+          updateSelectedPartsUI();
+          
+          if (failureCount === 0) {
+            alert(`Successfully issued ${successCount} part(s)!`);
+          } else {
+            alert(`Issued ${successCount} part(s), but ${failureCount} failed.\nErrors: ${errors.join('\n')}`);
+          }
+        } else {
+          alert(`Failed to issue parts.\nErrors: ${errors.join('\n')}`);
+        }
+      } catch (error) {
+        console.error('Parts issuance error:', error);
+        logDebug('Parts issuance error', error.message);
+        alert('Failed to issue parts. Please try again.');
+      }
+    });
+    
+    // Handle logout
+    function logout() {
+      logDebug('Logging out');
+      console.log('Logout function called');
+      
+      // Show an alert before proceeding
+      if (confirm('Are you sure you want to logout?')) {
+        // Add a visible indication that logout is happening
+        document.body.style.opacity = '0.7';
+        document.body.style.pointerEvents = 'none';
+        
+        fetch('/api/logout', { 
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => {
+            console.log('Logout response:', response.status);
+            logDebug('Logout response received', response.status);
+            
+            // Always consider logout successful locally even if server has issues
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-navigation-bar').style.display = 'none';
+            document.getElementById('mobile-bottom-navigation').style.display = 'none';
+            currentUser = null;
+            document.getElementById('user-name').textContent = '';
+            
+            // Restore opacity
+            document.body.style.opacity = '1';
+            document.body.style.pointerEvents = 'auto';
+            
+            // Load technicians for the login dropdown
+            loadTechniciansForLogin();
+            
+            // Show message based on server response
+            const loginSection = document.getElementById('login-section');
+            const msgElement = document.createElement('div');
+            
+            if (response.ok) {
+              logDebug('Logout successful');
+              msgElement.className = 'alert success';
+              msgElement.textContent = 'You have been logged out successfully.';
+            } else {
+              logDebug('Server had issues with logout, but user is logged out locally');
+              msgElement.className = 'alert warning';
+              msgElement.textContent = 'You have been logged out on this device.';
+            }
+            
+            loginSection.prepend(msgElement);
+            setTimeout(() => msgElement.remove(), 3000);
+          })
+          .catch(err => {
+            console.error('Logout error:', err);
+            logDebug('Logout error', err.message);
+            
+            // Still log out locally even if there's an error
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-navigation-bar').style.display = 'none';
+            document.getElementById('mobile-bottom-navigation').style.display = 'none';
+            currentUser = null;
+            document.getElementById('user-name').textContent = '';
+            
+            // Restore opacity
+            document.body.style.opacity = '1';
+            document.body.style.pointerEvents = 'auto';
+            
+            // Load technicians for the login dropdown
+            loadTechniciansForLogin();
+            
+            // Show a message
+            const loginSection = document.getElementById('login-section');
+            const msgElement = document.createElement('div');
+            msgElement.className = 'alert warning';
+            msgElement.textContent = 'Error during logout, but you have been logged out on this device.';
+            loginSection.prepend(msgElement);
+            setTimeout(() => msgElement.remove(), 3000);
+          });
+      }
+    }
+    
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', () => {
+      initPage();
+      
+      // Set up logout button event listener with proper delegation
+      const logoutButton = document.getElementById('logout-button');
+      if (logoutButton) {
+        logoutButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Logout button clicked');
+          logout();
+        });
+      } else {
+        console.error('Logout button not found in DOM');
+      }
+      
+      // Set up the Show Mobile Issuance button for admins
+      const showMobileIssuanceBtn = document.getElementById('show-mobile-issuance');
+      if (showMobileIssuanceBtn) {
+        showMobileIssuanceBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          
+          // Create confirmation dialog
+          if (confirm('You are about to switch to the technician parts issuance interface. You can return to the admin dashboard by logging out and back in as an administrator. Continue?')) {
+            // Apply transition effects
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const mainContent = document.getElementById('main-content');
+            
+            // Fade out admin dashboard
+            adminDashboard.style.transition = 'opacity 0.3s ease';
+            adminDashboard.style.opacity = '0';
+            
+            // After fade out completes, switch displays and fade in the parts issuance
+            setTimeout(() => {
+              adminDashboard.style.display = 'none';
+              
+              // Show the admin quick links at the top for easy navigation back
+              mainContent.style.display = 'block';
+              mainContent.style.opacity = '0';
+              
+              // Make sure admin quick links are visible
+              const adminQuickLinks = document.getElementById('admin-quick-links');
+              adminQuickLinks.style.display = 'block';
+              
+              // Fade in the parts issuance interface
+              setTimeout(() => {
+                mainContent.style.transition = 'opacity 0.3s ease';
+                mainContent.style.opacity = '1';
+                
+                logDebug('Switched to mobile parts issuance interface');
+              }, 50);
+            }, 300);
+          }
+        });
+      }
+      
+      // Add mobile-specific touch event handlers
+      document.addEventListener('touchstart', function() {
+        console.log('Touch event detected - ensuring mobile compatibility');
+      }, {passive: true});
+    });
+    
+    // Mobile bottom navigation has been removed
+    function initBottomNavigation() {
+      // Bottom navigation bar has been removed per requirement
+      // Keep the function for compatibility
+    }
+  </script>
+  
+  <!-- Mobile Bottom Navigation Bar has been removed per requirement -->
+  <!-- The div below is kept for backward compatibility but is permanently hidden -->
+  <div id="mobile-bottom-navigation" style="display: none"></div>
+  
+  <script type="text/javascript">
+    // Function to add admin-specific navigation items
+    function initAdminNavItems() {
+      if (currentUser && currentUser.role === 'admin') {
+        // Update the home link text and icon for admins
+        const homeLink = document.querySelector('.admin-home-link');
+        if (homeLink) {
+          homeLink.innerHTML = `
+            <span style="font-size: 20px; margin-bottom: 4px;">🏢</span>
+            <span style="font-size: 12px;">Admin</span>
+          `;
+        }
+        
+        const adminNavContainer = document.getElementById('admin-nav-container');
+        if (adminNavContainer) {
+          adminNavContainer.innerHTML = `
+            <a href="/reports" class="bottom-nav-item" style="color: white; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 50px; height: 100%;">
+              <span style="font-size: 20px; margin-bottom: 4px;">📊</span>
+              <span style="font-size: 12px;">Reports</span>
+            </a>
+            <a href="/technicians" class="bottom-nav-item" style="color: white; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 50px; height: 100%;">
+              <span style="font-size: 20px; margin-bottom: 4px;">👥</span>
+              <span style="font-size: 12px;">Techs</span>
+            </a>
+            <a href="/buildings" class="bottom-nav-item" style="color: white; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 50px; height: 100%;">
+              <span style="font-size: 20px; margin-bottom: 4px;">🏢</span>
+              <span style="font-size: 12px;">Bldgs</span>
+            </a>
+          `;
+        }
+      }
+    }
+    
+    // Call this function after user authentication is complete
+    document.addEventListener('userAuthenticated', function() {
+      initAdminNavItems();
+    });
+    
+    // Also check immediately if user is already logged in
+    if (currentUser && currentUser.role === 'admin') {
+      initAdminNavItems();
+    }
+  </script>
+</body>
+</html>

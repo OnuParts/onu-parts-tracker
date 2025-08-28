@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 400px;
+      width: 100%;
+    }
+    
+    .logo-container {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo {
+      height: 80px;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-align: center;
+      color: #111;
+    }
+    
+    .subtitle {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: border-color 0.15s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #F36532;
+      box-shadow: 0 0 0 2px rgba(243, 101, 50, 0.2);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+      transition: all 0.15s ease;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: #F36532;
+      box-shadow: 0 0 0 2px rgba(243, 101, 50, 0.2);
+    }
+    
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #F36532;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .btn:hover {
+      background-color: #e55420;
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #F36532;
+      color: #F36532;
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(243, 101, 50, 0.1);
+    }
+    
+    .tab-container {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      flex: 1;
+      padding: 0.75rem;
+      text-align: center;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    
+    .tab.active {
+      background-color: #F36532;
+      color: white;
+    }
+    
+    .tab:not(.active) {
+      background-color: #f5f5f5;
+      color: #666;
+    }
+    
+    .tab:not(.active):hover {
+      background-color: #eee;
+    }
+    
+    .form-container {
+      display: none;
+    }
+    
+    .form-container.active {
+      display: block;
+    }
+    
+    .error-message {
+      color: #e11d48;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .success-message {
+      color: #059669;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+    
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(243, 101, 50, 0.2);
+      border-radius: 50%;
+      border-top-color: #F36532;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .back-link {
+      text-align: center;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+    }
+    
+    .back-link a {
+      color: #F36532;
+      text-decoration: none;
+    }
+    
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="/external-logo.png" alt="Logo" class="logo" style="height: 140px; width: auto;">
+    </div>
+    
+    <div class="tab-container">
+      <div class="tab active" id="admin-tab">Administrator</div>
+      <div class="tab" id="student-tab">Student Worker</div>
+      <div class="tab" id="technician-tab">Technician</div>
+      <div class="tab" id="controller-tab">Controller</div>
+    </div>
+    
+    <div class="card">
+      <!-- Admin Login Form -->
+      <div class="form-container active" id="admin-form">
+        <form action="/api/login" method="POST">
+          <input type="hidden" name="role" value="admin">
+          <div class="form-group">
+            <label for="admin-username" class="form-label">Username</label>
+            <input type="text" id="admin-username" name="username" class="form-input" required placeholder="Username">
+          </div>
+          <div class="form-group">
+            <label for="admin-password" class="form-label">Password</label>
+            <input type="password" id="admin-password" name="password" class="form-input" required placeholder="Password">
+          </div>
+          <button type="submit" class="btn">Login as Administrator</button>
+          <div class="error-message" id="admin-error"></div>
+        </form>
+      </div>
+      
+      <!-- Student Login Form -->
+      <div class="form-container" id="student-form">
+        <form action="/api/login" method="POST">
+          <input type="hidden" name="role" value="student">
+          <div class="form-group">
+            <label for="student-username" class="form-label">Username</label>
+            <input type="text" id="student-username" name="username" class="form-input" required placeholder="Username">
+          </div>
+          <div class="form-group">
+            <label for="student-password" class="form-label">Password</label>
+            <input type="password" id="student-password" name="password" class="form-input" required placeholder="Password">
+          </div>
+          <button type="submit" class="btn">Login as Student Worker</button>
+          <div class="error-message" id="student-error"></div>
+        </form>
+      </div>
+      
+      <!-- Technician Login Form -->
+      <div class="form-container" id="technician-form">
+        <form id="technician-login-form">
+          <div class="form-group">
+            <label for="technician-select" class="form-label">Select Technician</label>
+            <select id="technician-select" class="form-select" required>
+              <option value="">-- Select your name --</option>
+              <!-- Technician options will be loaded here -->
+            </select>
+          </div>
+          <button type="submit" class="btn">Login as Technician</button>
+          <div class="error-message" id="technician-error"></div>
+          <div id="technicians-loading" class="loading">
+            <div class="spinner"></div>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Controller Login Form -->
+      <div class="form-container" id="controller-form">
+        <form action="/api/login" method="POST">
+          <input type="hidden" name="role" value="controller">
+          <div class="form-group">
+            <label for="controller-username" class="form-label">Username</label>
+            <input type="text" id="controller-username" name="username" class="form-input" required placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label for="controller-password" class="form-label">Password</label>
+            <input type="password" id="controller-password" name="password" class="form-input" required placeholder="Enter password">
+          </div>
+          <button type="submit" class="btn">Login as Controller</button>
+          <div class="error-message" id="controller-error"></div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Request Delivery Link -->
+    <div class="card" style="text-align: center; padding: 1rem;">
+      <p style="font-size: 0.875rem; color: #666; margin-bottom: 1rem;">
+        Need office supplies delivered? No login required.
+      </p>
+      <a href="/request-delivery.html" class="btn btn-outline">Request Delivery</a>
+    </div>
+    
+    <!-- No mobile-specific links needed as this is the only login page -->
+    <div class="back-link">
+      <a href="/">Back to Home</a>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Tab switching functionality
+      const adminTab = document.getElementById('admin-tab');
+      const studentTab = document.getElementById('student-tab');
+      const technicianTab = document.getElementById('technician-tab');
+      const controllerTab = document.getElementById('controller-tab');
+      const adminForm = document.getElementById('admin-form');
+      const studentForm = document.getElementById('student-form');
+      const technicianForm = document.getElementById('technician-form');
+      const controllerForm = document.getElementById('controller-form');
+      
+      adminTab.addEventListener('click', function() {
+        adminTab.classList.add('active');
+        studentTab.classList.remove('active');
+        technicianTab.classList.remove('active');
+        controllerTab.classList.remove('active');
+        adminForm.classList.add('active');
+        studentForm.classList.remove('active');
+        technicianForm.classList.remove('active');
+        controllerForm.classList.remove('active');
+      });
+      
+      studentTab.addEventListener('click', function() {
+        studentTab.classList.add('active');
+        adminTab.classList.remove('active');
+        technicianTab.classList.remove('active');
+        controllerTab.classList.remove('active');
+        studentForm.classList.add('active');
+        adminForm.classList.remove('active');
+        technicianForm.classList.remove('active');
+        controllerForm.classList.remove('active');
+      });
+      
+      technicianTab.addEventListener('click', function() {
+        technicianTab.classList.add('active');
+        adminTab.classList.remove('active');
+        studentTab.classList.remove('active');
+        controllerTab.classList.remove('active');
+        technicianForm.classList.add('active');
+        adminForm.classList.remove('active');
+        studentForm.classList.remove('active');
+        controllerForm.classList.remove('active');
+      });
+      
+      controllerTab.addEventListener('click', function() {
+        controllerTab.classList.add('active');
+        adminTab.classList.remove('active');
+        studentTab.classList.remove('active');
+        technicianTab.classList.remove('active');
+        controllerForm.classList.add('active');
+        adminForm.classList.remove('active');
+        studentForm.classList.remove('active');
+        technicianForm.classList.remove('active');
+      });
+      
+      // Load technicians
+      const technicianSelect = document.getElementById('technician-select');
+      const techniciansLoading = document.getElementById('technicians-loading');
+      
+      async function loadTechnicians() {
+        try {
+          const response = await fetch('/api/technicians-list');
+          const technicians = await response.json();
+          
+          techniciansLoading.style.display = 'none';
+          
+          if (Array.isArray(technicians) && technicians.length > 0) {
+            // Sort technicians by last name
+            technicians.sort((a, b) => {
+              // Get last name for sorting
+              const getLastName = (fullName) => {
+                const parts = fullName.trim().split(' ');
+                return parts.length > 1 ? parts[parts.length - 1] : fullName;
+              };
+              
+              return getLastName(a.name).localeCompare(getLastName(b.name));
+            });
+            
+            // Add technicians to dropdown
+            technicians.forEach(tech => {
+              const option = document.createElement('option');
+              option.value = tech.id;
+              option.textContent = tech.name + (tech.department ? ` (${tech.department})` : '');
+              technicianSelect.appendChild(option);
+            });
+          } else {
+            technicianSelect.innerHTML = '<option value="">No technicians found</option>';
+          }
+        } catch (error) {
+          console.error('Error loading technicians:', error);
+          techniciansLoading.style.display = 'none';
+          technicianSelect.innerHTML = '<option value="">Error loading technicians</option>';
+        }
+      }
+      
+      loadTechnicians();
+      
+      // Error handling for form submission
+      const adminLoginForm = adminForm.querySelector('form');
+      const studentLoginForm = studentForm.querySelector('form');
+      const technicianLoginForm = document.getElementById('technician-login-form');
+      const adminError = document.getElementById('admin-error');
+      const studentError = document.getElementById('student-error');
+      const technicianError = document.getElementById('technician-error');
+      
+      adminLoginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const username = document.getElementById('admin-username').value;
+        const password = document.getElementById('admin-password').value;
+        
+        try {
+          // Try both login methods - first try the direct admin route
+          const directAdminResponse = await fetch('/api/direct-admin-login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: username,
+              password: password
+            }),
+          });
+          
+          // If direct admin login succeeds, use that response
+          if (directAdminResponse.ok) {
+            return window.location.href = '/dashboard';
+          }
+          
+          // Otherwise try the normal login route
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: username,
+              password: password,
+              role: 'admin'
+            }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            window.location.href = '/dashboard';
+          } else {
+            const data = await response.text();
+            adminError.textContent = data || 'Invalid credentials';
+            adminError.style.display = 'block';
+          }
+        } catch (error) {
+          adminError.textContent = 'Login failed. Please try again.';
+          adminError.style.display = 'block';
+        }
+      });
+      
+      studentLoginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              username: document.getElementById('student-username').value,
+              password: document.getElementById('student-password').value,
+              role: 'student'
+            }),
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            window.location.href = '/parts-inventory';
+          } else {
+            const data = await response.text();
+            studentError.textContent = data || 'Invalid credentials';
+            studentError.style.display = 'block';
+          }
+        } catch (error) {
+          studentError.textContent = 'Login failed. Please try again.';
+          studentError.style.display = 'block';
+        }
+      });
+      
+      technicianLoginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const techId = document.getElementById('technician-select').value;
+        
+        if (!techId) {
+          technicianError.textContent = 'Please select a technician';
+          technicianError.style.display = 'block';
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              id: techId,
+              role: 'technician'
+            }),
+          });
+          
+          if (response.ok) {
+            window.location.href = '/dashboard';
+          } else {
+            const data = await response.text();
+            technicianError.textContent = data || 'Login failed';
+            technicianError.style.display = 'block';
+          }
+        } catch (error) {
+          technicianError.textContent = 'Login failed. Please try again.';
+          technicianError.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONU Parts Tracker - Mobile Login</title>
+  <script>
+    // Helper function for safe redirections on mobile
+    function safeRedirect(path) {
+      // Detect if mobile and redirect to absolute URL
+      if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = window.location.origin + path;
+      } else {
+        window.location.href = path;
+      }
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.6;
+      background-color: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      color: #F36532;
+      margin-bottom: 5px;
+    }
+    
+    .header p {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .login-box {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .login-box h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #F36532;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #F36532;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 5px;
+      text-align: center;
+    }
+    
+    .btn:hover {
+      background: #e55420;
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #F36532;
+      color: #F36532;
+    }
+    
+    .btn-outline:hover {
+      background: rgba(243, 101, 50, 0.1);
+    }
+    
+    .divider {
+      text-align: center;
+      margin: 20px 0;
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .tech-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 15px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+    }
+    
+    .tech-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .tech-item:last-child {
+      border-bottom: none;
+    }
+    
+    .tech-name {
+      font-weight: 500;
+    }
+    
+    .tech-dept {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .status {
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+    }
+    
+    .status.error {
+      background: #ffebee;
+      color: #c62828;
+      display: block;
+    }
+    
+    .status.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    
+    .spinner {
+      display: none;
+      width: 24px;
+      height: 24px;
+      margin: 10px auto;
+      border: 3px solid rgba(243, 101, 50, 0.2);
+      border-radius: 50%;
+      border-top-color: #F36532;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading .spinner {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ONU Parts Tracker</h1>
+      <p>Mobile Login</p>
+    </div>
+    
+    <!-- Admin Login -->
+    <div class="login-box">
+      <h2>Admin Login</h2>
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label for="adminUsername">Username</label>
+          <input type="text" id="adminUsername" placeholder="admin" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" placeholder="JaciJo2012" autocomplete="off">
+        </div>
+        <button type="submit" class="btn">Login as Admin</button>
+      </form>
+      <div id="adminStatus" class="status"></div>
+    </div>
+    
+    <!-- Student Login -->
+    <div class="login-box">
+      <h2>Student Login</h2>
+      <form id="studentLoginForm">
+        <div class="form-group">
+          <label for="studentUsername">Username</label>
+          <input type="text" id="studentUsername" placeholder="Student" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="studentPassword">Password</label>
+          <input type="password" id="studentPassword" placeholder="Onu" autocomplete="off">
+        </div>
+        <button type="submit" class="btn">Login as Student</button>
+      </form>
+      <div id="studentStatus" class="status"></div>
+    </div>
+    
+    <!-- Technician Name Login -->
+    <div class="login-box">
+      <h2>Technician Login</h2>
+      <form id="techNameForm">
+        <div class="form-group">
+          <label for="techName">Your Name</label>
+          <input type="text" id="techName" placeholder="Enter your full name" autocomplete="off">
+        </div>
+        <button type="submit" class="btn">Login with Name</button>
+      </form>
+      <div id="nameStatus" class="status"></div>
+      
+      <div class="divider">- OR -</div>
+      
+      <h3 style="margin-top: 15px; font-size: 16px;">Select from List</h3>
+      <div id="techListContainer" class="tech-list">
+        <div style="padding: 10px; text-align: center;">Loading technicians...</div>
+      </div>
+      <div id="techListStatus" class="status"></div>
+    </div>
+    
+    <div class="spinner" id="mainSpinner"></div>
+  </div>
+  
+  <script>
+    // DOM Elements
+    const adminForm = document.getElementById('adminLoginForm');
+    const studentForm = document.getElementById('studentLoginForm');
+    const techNameForm = document.getElementById('techNameForm');
+    const techListContainer = document.getElementById('techListContainer');
+    
+    const adminStatus = document.getElementById('adminStatus');
+    const studentStatus = document.getElementById('studentStatus');
+    const nameStatus = document.getElementById('nameStatus');
+    const techListStatus = document.getElementById('techListStatus');
+    const mainSpinner = document.getElementById('mainSpinner');
+    
+    // Helper Functions
+    function showError(element, message) {
+      element.textContent = message;
+      element.className = 'status error';
+      setTimeout(() => {
+        element.className = 'status';
+      }, 5000);
+    }
+    
+    function showSuccess(element, message) {
+      element.textContent = message;
+      element.className = 'status success';
+    }
+    
+    function showSpinner() {
+      mainSpinner.style.display = 'block';
+      document.querySelectorAll('button').forEach(btn => {
+        btn.disabled = true;
+      });
+    }
+    
+    function hideSpinner() {
+      mainSpinner.style.display = 'none';
+      document.querySelectorAll('button').forEach(btn => {
+        btn.disabled = false;
+      });
+    }
+    
+    // Fetch technician list
+    fetch('/api/technicians-list')
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to load technicians');
+        return response.json();
+      })
+      .then(technicians => {
+        if (!technicians || technicians.length === 0) {
+          techListContainer.innerHTML = '<div style="padding: 10px; text-align: center;">No technicians available</div>';
+          return;
+        }
+        
+        const techItems = technicians.map(tech => {
+          return `
+            <div class="tech-item" data-username="${tech.username}">
+              <div class="tech-name">${tech.name}</div>
+              ${tech.department ? `<div class="tech-dept">${tech.department}</div>` : ''}
+              <button class="btn tech-select" data-username="${tech.username}">Select</button>
+            </div>
+          `;
+        }).join('');
+        
+        techListContainer.innerHTML = techItems;
+        
+        // Add event listeners to tech selection buttons
+        document.querySelectorAll('.tech-select').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const username = this.getAttribute('data-username');
+            loginAsTechnician(username);
+          });
+        });
+      })
+      .catch(error => {
+        console.error('Error loading technicians:', error);
+        techListContainer.innerHTML = '<div style="padding: 10px; text-align: center;">Error loading technicians</div>';
+      });
+    
+    // Admin Login
+    adminForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('adminUsername').value.trim() || 'admin';
+      const password = document.getElementById('adminPassword').value.trim() || 'JaciJo2012';
+      
+      if (!username || !password) {
+        showError(adminStatus, 'Please enter both username and password');
+        return;
+      }
+      
+      showSpinner();
+      
+      // First try the standard login path
+      fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username, 
+          password,
+          role: 'admin'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          showSuccess(adminStatus, 'Login successful! Redirecting...');
+          setTimeout(() => {
+            // Detect if mobile and redirect to absolute URL
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              window.location.href = window.location.origin + '/dashboard';
+            } else {
+              window.location.href = '/dashboard';
+            }
+          }, 500);
+          return;
+        }
+        
+        // If standard login fails, try direct admin login as fallback
+        return fetch('/api/direct-admin-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            showSuccess(adminStatus, 'Login successful! Redirecting...');
+            setTimeout(() => {
+              // Detect if mobile and redirect to absolute URL
+              if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.location.href = window.location.origin + '/dashboard';
+              } else {
+                window.location.href = '/dashboard';
+              }
+            }, 500);
+          } else {
+            throw new Error(data.error || 'Login failed');
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Admin login error:', error);
+        showError(adminStatus, error.message || 'Login failed. Please try again.');
+        hideSpinner();
+      });
+    });
+    
+    // Student Login
+    studentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('studentUsername').value.trim() || 'Student';
+      const password = document.getElementById('studentPassword').value.trim() || 'Onu';
+      
+      if (!username || !password) {
+        showError(studentStatus, 'Please enter both username and password');
+        return;
+      }
+      
+      showSpinner();
+      
+      fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username, 
+          password,
+          role: 'student'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          showSuccess(studentStatus, 'Login successful! Redirecting...');
+          setTimeout(() => {
+            // Detect if mobile and redirect to absolute URL
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              window.location.href = window.location.origin + '/parts-inventory';
+            } else {
+              window.location.href = '/parts-inventory';
+            }
+          }, 500);
+          return;
+        }
+        
+        // If standard login fails, try again with just username and password
+        return fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+        .then(response => {
+          if (response.ok) {
+            showSuccess(studentStatus, 'Login successful! Redirecting...');
+            setTimeout(() => {
+              // Detect if mobile and redirect to absolute URL
+              if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.location.href = window.location.origin + '/parts-inventory';
+              } else {
+                window.location.href = '/parts-inventory';
+              }
+            }, 500);
+          } else {
+            throw new Error('Invalid student credentials');
+          }
+        });
+      })
+      .catch(error => {
+        console.error('Student login error:', error);
+        showError(studentStatus, error.message || 'Login failed. Please try again.');
+        hideSpinner();
+      });
+    });
+    
+    // Technician Name Login
+    techNameForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('techName').value.trim();
+      
+      if (!name) {
+        showError(nameStatus, 'Please enter your name');
+        return;
+      }
+      
+      showSpinner();
+      
+      // First try with name and role
+      fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          name,
+          role: 'technician'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          showSuccess(nameStatus, 'Login successful! Redirecting...');
+          setTimeout(() => {
+            // Detect if mobile and redirect to absolute URL
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              window.location.href = window.location.origin + '/dashboard';
+            } else {
+              window.location.href = '/dashboard';
+            }
+          }, 500);
+          return;
+        }
+        
+        // Then try with just name, no role
+        return fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name })
+        })
+        .then(response => {
+          if (response.ok) {
+            showSuccess(nameStatus, 'Login successful! Redirecting...');
+            setTimeout(() => {
+              // Detect if mobile and redirect to absolute URL
+              if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.location.href = window.location.origin + '/dashboard';
+              } else {
+                window.location.href = '/dashboard';
+              }
+            }, 500);
+            return;
+          }
+          throw new Error('Login failed');
+        });
+      })
+      .catch(error => {
+        console.error('Technician name login error:', error);
+        showError(nameStatus, error.message || 'Login failed. Please try again.');
+        hideSpinner();
+      });
+    });
+    
+    // Function to login as technician by username
+    function loginAsTechnician(username) {
+      if (!username) {
+        showError(techListStatus, 'Invalid technician selection');
+        return;
+      }
+      
+      showSpinner();
+      
+      // First try with username and role
+      fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username,
+          role: 'technician'
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          showSuccess(techListStatus, 'Login successful! Redirecting...');
+          setTimeout(() => {
+            // Detect if mobile and redirect to absolute URL
+            if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+              window.location.href = window.location.origin + '/dashboard';
+            } else {
+              window.location.href = '/dashboard';
+            }
+          }, 500);
+          return;
+        }
+        
+        // If that fails, try with just username
+        return fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username })
+        })
+        .then(response => {
+          if (response.ok) {
+            showSuccess(techListStatus, 'Login successful! Redirecting...');
+            setTimeout(() => {
+              // Detect if mobile and redirect to absolute URL
+              if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                window.location.href = window.location.origin + '/dashboard';
+              } else {
+                window.location.href = '/dashboard';
+              }
+            }, 500);
+            return;
+          }
+          throw new Error('Login failed');
+        });
+      })
+      .catch(error => {
+        console.error('Technician selection login error:', error);
+        showError(techListStatus, error.message || 'Login failed. Please try again.');
+        hideSpinner();
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONU Parts Tracker - Mobile Login</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .logo {
+            display: block;
+            width: 80px;
+            margin: 0 auto 20px auto;
+        }
+        h1 {
+            color: #F36532;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: block;
+            background-color: #F36532;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
+        }
+        .button:hover {
+            background-color: #e55a2a;
+        }
+        .button.secondary {
+            background-color: #666;
+        }
+        .button.secondary:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <img src="/onu-logo.png" alt="ONU Parts Tracker" class="logo" style="height: 100px; margin-bottom: 20px;">
+        <p class="subtitle">Select Your Role</p>
+        
+        <a href="/admin-login" class="button">Administrator Login</a>
+        <a href="/student-login" class="button">Student Worker Login</a>
+        <a href="/tech-login" class="button">Technician Login</a>
+        
+        <p class="subtitle">For best experience on mobile devices</p>
+    </div>
+</body>
+</html>

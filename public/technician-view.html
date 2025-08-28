@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONU Parts Tracker - Technician View</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    header {
+      background-color: #F36532;
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 100%;
+      margin: 70px 1rem 1rem 1rem;
+      padding-bottom: 2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1rem;
+    }
+    .card-header {
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 0.5rem 0;
+    }
+    .card-description {
+      color: #777;
+      margin: 0;
+      font-size: 0.875rem;
+    }
+    .search-box {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid #eee;
+      font-weight: 600;
+      color: #555;
+    }
+    td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .issue-btn {
+      background-color: #F36532;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .issue-btn:hover {
+      background-color: #e55a28;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    .empty-icon {
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 1rem;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(243, 101, 50, 0.1);
+      border-left-color: #F36532;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-width: 500px;
+      margin: 2rem auto;
+      max-height: calc(100vh - 4rem);
+      overflow-y: auto;
+    }
+    .modal-title {
+      margin-top: 0;
+      font-size: 1.25rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .error-message {
+      color: #e53e3e;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-top: 1.5rem;
+    }
+    .btn-cancel {
+      background-color: #f1f1f1;
+      color: #555;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .recent-table {
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/onu-logo.png" alt="ONU Parts Tracker Logo" style="height: 60px;">
+    <div class="user-info">
+      <span id="user-name">Loading...</span>
+      <button class="logout-btn" onclick="logout()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Recent Parts Issuance</h2>
+        <p class="card-description">History of recently issued parts</p>
+      </div>
+      <div id="recent-issuance-container">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading recent issuance...</p>
+        </div>
+      </div>
+      <button class="issue-btn" onclick="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Issue Parts
+      </button>
+    </div>
+  </div>
+
+  <!-- Issue Parts Modal -->
+  <div id="issue-modal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Issue Parts</h3>
+      <p>Select a part and quantity to issue</p>
+      
+      <form id="issue-form">
+        <div class="form-group">
+          <label class="form-label" for="part-select">Part</label>
+          <select id="part-select" class="form-select" required>
+            <option value="">Select part</option>
+          </select>
+          <div id="part-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="quantity-input">Quantity</label>
+          <input type="number" id="quantity-input" class="form-input" min="1" value="1" required>
+          <div id="quantity-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="issue-date">Date</label>
+          <input type="date" id="issue-date" class="form-input" required>
+          <div id="date-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="building-select">Building</label>
+          <select id="building-select" class="form-select" required>
+            <option value="">Select building</option>
+          </select>
+          <div id="building-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="issued-to-select">Issued To</label>
+          <select id="issued-to-select" class="form-select" required>
+            <option value="">Select person</option>
+          </select>
+          <div id="issued-to-error" class="error-message"></div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="cost-center-select">Cost Center (Optional)</label>
+          <select id="cost-center-select" class="form-select">
+            <option value="">Select a cost center</option>
+            <!-- Cost centers will be populated via JavaScript -->
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="notes-input">Notes (Optional)</label>
+          <textarea id="notes-input" class="form-input" rows="2"></textarea>
+        </div>
+        
+        <div class="btn-row">
+          <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="issue-btn">Issue Part</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Global state
+    let currentUser = null;
+    let parts = [];
+    let buildings = [];
+    let technicians = [];
+    let costCenters = [];
+    let recentIssuance = [];
+    
+    // Check if user is authenticated
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/current-user');
+        if (response.ok) {
+          currentUser = await response.json();
+          document.getElementById('user-name').textContent = currentUser.name;
+          return true;
+        } else {
+          window.location.href = '/m';
+          return false;
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/m';
+        return false;
+      }
+    }
+    
+    // Fetch data from API
+    async function fetchData() {
+      if (!await checkAuth()) return;
+      
+      try {
+        // Load parts
+        const partsResponse = await fetch('/api/parts');
+        if (partsResponse.ok) {
+          parts = await partsResponse.json();
+          populatePartSelect();
+        }
+        
+        // Load buildings
+        const buildingsResponse = await fetch('/api/buildings');
+        if (buildingsResponse.ok) {
+          buildings = await buildingsResponse.json();
+          populateBuildingSelect();
+        }
+        
+        // Load technicians
+        const techniciansResponse = await fetch('/api/technicians-list');
+        if (techniciansResponse.ok) {
+          technicians = await techniciansResponse.json();
+          populateTechnicianSelect();
+        }
+        
+        // Load cost centers
+        const costCentersResponse = await fetch('/api/cost-centers');
+        if (costCentersResponse.ok) {
+          costCenters = await costCentersResponse.json();
+          populateCostCenterSelect();
+        }
+        
+        // Load recent issuance
+        const issuanceResponse = await fetch('/api/parts-issuance/recent');
+        if (issuanceResponse.ok) {
+          recentIssuance = await issuanceResponse.json();
+          renderRecentIssuance();
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    }
+    
+    // Populate part select dropdown
+    function populatePartSelect() {
+      const select = document.getElementById('part-select');
+      select.innerHTML = '<option value="">Select part</option>';
+      
+      // Sort parts by name
+      parts.sort((a, b) => a.name.localeCompare(b.name));
+      
+      parts.forEach(part => {
+        if (part.quantity > 0) {
+          const option = document.createElement('option');
+          option.value = part.id;
+          option.textContent = `${part.name} - ${part.partId} (${part.quantity} available)`;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Populate building select dropdown
+    function populateBuildingSelect() {
+      const select = document.getElementById('building-select');
+      select.innerHTML = '<option value="">Select building</option>';
+      
+      buildings.forEach(building => {
+        const option = document.createElement('option');
+        option.value = building.name;
+        option.textContent = building.name;
+        select.appendChild(option);
+      });
+      
+      // Add 'Other' option if no buildings
+      if (buildings.length === 0) {
+        const option = document.createElement('option');
+        option.value = 'Other';
+        option.textContent = 'Other';
+        select.appendChild(option);
+      }
+    }
+    
+    // Populate technician select dropdown
+    function populateTechnicianSelect() {
+      const select = document.getElementById('issued-to-select');
+      select.innerHTML = '<option value="">Select person</option>';
+      
+      // Add current user as first option
+      if (currentUser) {
+        const option = document.createElement('option');
+        option.value = currentUser.name;
+        option.textContent = `${currentUser.name} (You)`;
+        select.appendChild(option);
+        
+        // Set current user as default selected
+        select.value = currentUser.name;
+      }
+      
+      // Add other technicians
+      technicians.forEach(tech => {
+        if (!currentUser || tech.name !== currentUser.name) {
+          const option = document.createElement('option');
+          option.value = tech.name;
+          option.textContent = `${tech.name}${tech.department ? ` - ${tech.department}` : ''}`;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Populate cost center select dropdown
+    function populateCostCenterSelect() {
+      const select = document.getElementById('cost-center-select');
+      select.innerHTML = '<option value="">Select a cost center</option>';
+      
+      // Sort cost centers by code
+      costCenters.sort((a, b) => a.code.localeCompare(b.code));
+      
+      costCenters.forEach(center => {
+        const option = document.createElement('option');
+        option.value = center.code;
+        option.textContent = `${center.code} - ${center.name}`;
+        select.appendChild(option);
+      });
+    }
+    
+    // Render recent issuance table
+    function renderRecentIssuance() {
+      const container = document.getElementById('recent-issuance-container');
+      
+      if (recentIssuance.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No parts have been issued yet</h3>
+            <p>Start issuing parts by clicking the "Issue Parts" button.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Create table HTML
+      let tableHtml = `
+        <table class="recent-table">
+          <thead>
+            <tr>
+              <th>Part ID</th>
+              <th>Part Name</th>
+              <th>Qty</th>
+              <th>Building</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      // Add rows
+      recentIssuance.forEach(issuance => {
+        tableHtml += `
+          <tr>
+            <td>${issuance.part.partId}</td>
+            <td>${issuance.part.name}</td>
+            <td>${issuance.quantity}</td>
+            <td>${issuance.projectCode || issuance.reason}</td>
+            <td>${new Date(issuance.issuedAt).toLocaleDateString()}</td>
+          </tr>
+        `;
+      });
+      
+      tableHtml += `
+          </tbody>
+        </table>
+      `;
+      
+      container.innerHTML = tableHtml;
+    }
+    
+    // Open the issue parts modal
+    function openModal() {
+      document.getElementById('issue-modal').style.display = 'block';
+    }
+    
+    // Close the issue parts modal
+    function closeModal() {
+      document.getElementById('issue-modal').style.display = 'none';
+      clearFormErrors();
+    }
+    
+    // Clear form errors
+    function clearFormErrors() {
+      const errorElements = document.querySelectorAll('.error-message');
+      errorElements.forEach(el => el.textContent = '');
+    }
+    
+    // Handle form submission
+    document.getElementById('issue-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearFormErrors();
+      
+      // Validate form
+      const partId = parseInt(document.getElementById('part-select').value);
+      const quantity = parseInt(document.getElementById('quantity-input').value);
+      const issueDate = document.getElementById('issue-date').value;
+      const building = document.getElementById('building-select').value;
+      const issuedTo = document.getElementById('issued-to-select').value;
+      const costCenter = document.getElementById('cost-center-select').value;
+      const notes = document.getElementById('notes-input').value;
+      
+      let isValid = true;
+      
+      if (!partId) {
+        document.getElementById('part-error').textContent = 'Please select a part';
+        isValid = false;
+      }
+      
+      if (!quantity || quantity < 1) {
+        document.getElementById('quantity-error').textContent = 'Quantity must be at least 1';
+        isValid = false;
+      }
+      
+      if (!issueDate) {
+        document.getElementById('date-error').textContent = 'Please select a date';
+        isValid = false;
+      }
+      
+      if (!building) {
+        document.getElementById('building-error').textContent = 'Please select a building';
+        isValid = false;
+      }
+      
+      if (!issuedTo) {
+        document.getElementById('issued-to-error').textContent = 'Please select who is receiving the part';
+        isValid = false;
+      }
+      
+      if (!isValid) return;
+      
+      // Prepare data for submission
+      const submitData = {
+        partId,
+        quantity,
+        issuedAt: issueDate, // Add the date to the submission
+        building,
+        issuedTo,
+        reason: 'other', // Always use "other" for compatibility
+        projectCode: building, // Store building in projectCode for tracking
+      };
+      
+      // Add optional fields if provided
+      if (costCenter) submitData.costCenter = costCenter;
+      if (notes) submitData.notes = notes;
+      
+      try {
+        const response = await fetch('/api/parts-issuance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(submitData)
+        });
+        
+        if (response.ok) {
+          alert('Part issued successfully!');
+          closeModal();
+          
+          // Refresh data
+          fetchData();
+        } else {
+          const error = await response.text();
+          alert(`Failed to issue part: ${error}`);
+        }
+      } catch (error) {
+        console.error('Error issuing part:', error);
+        alert('Failed to issue part. Please try again.');
+      }
+    });
+    
+    // Handle logout
+    function logout() {
+      fetch('/api/logout', { method: 'POST' })
+        .then(() => {
+          window.location.href = '/m';
+        })
+        .catch(err => {
+          console.error('Logout error:', err);
+          alert('Failed to logout. Please try again.');
+        });
+    }
+    
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchData();
+      
+      // Set today's date as default in the date input
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('issue-date').value = today;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONU Parts Tracker - Quick Count</title>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root {
+      --primary: #F36532;
+      --primary-darker: #e55420;
+      --background: #f5f5f5;
+      --card-bg: #ffffff;
+      --text: #333333;
+      --text-light: #666666;
+      --border: #e0e0e0;
+      --error: #ef4444;
+      --success: #22c55e;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      padding: 16px;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    
+    h1 {
+      color: var(--primary);
+      font-size: 1.8rem;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 16px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-darker);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .button-secondary {
+      background-color: #f0f0f0;
+      color: var(--text);
+    }
+    
+    .button-secondary:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .error-text {
+      color: var(--error);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    .success-text {
+      color: var(--success);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    th {
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .reader-container {
+      display: none;
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
+    
+    #html5-qrcode-button-camera-permission {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .info-text {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-light);
+    }
+    
+    .camera-selector {
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .quantity-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .quantity-input {
+      width: 60px;
+      text-align: center;
+    }
+    
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .icon-button:hover {
+      color: var(--primary);
+      background: none;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-badge.low {
+      background-color: #fee2e2;
+      color: #ef4444;
+    }
+    
+    .status-badge.medium {
+      background-color: #fef3c7;
+      color: #f59e0b;
+    }
+    
+    .status-badge.high {
+      background-color: #d1fae5;
+      color: #10b981;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 32px 16px;
+      color: var(--text-light);
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .notifications {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .notification {
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      min-width: 200px;
+      max-width: 300px;
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    
+    .notification.error {
+      border-left: 4px solid var(--error);
+    }
+    
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px;
+      margin-left: 8px;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .slide-out {
+      animation: slideOut 0.3s ease-in forwards;
+    }
+    
+    @media (max-width: 640px) {
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .actions {
+        margin-top: 16px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+      
+      .card {
+        padding: 12px;
+      }
+      
+      table th:nth-child(3), 
+      table td:nth-child(3) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ONU Parts Tracker - Quick Count</h1>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Scan or Enter Part ID</div>
+      <div class="form-group">
+        <label for="part-id">Part ID or Barcode</label>
+        <input type="text" id="part-id" placeholder="Enter part ID or scan barcode" />
+      </div>
+      
+      <div class="form-group">
+        <label for="quantity">Count Quantity</label>
+        <input type="number" id="quantity" min="1" value="1" placeholder="Enter quantity" />
+      </div>
+      
+      <div class="actions">
+        <button id="add-part-btn" class="button">Add Part</button>
+        <button id="toggle-scanner-btn" class="button button-secondary">Scan Barcode</button>
+      </div>
+      
+      <div class="reader-container" id="reader-container">
+        <div class="camera-selector">
+          <label for="camera-select">Select Camera</label>
+          <select id="camera-select"></select>
+        </div>
+        <div id="reader"></div>
+        <p class="info-text">Position the barcode inside the scanning area.</p>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-title">Current Count List</div>
+      <div id="count-list-container">
+        <table id="count-list">
+          <thead>
+            <tr>
+              <th>Part ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="count-list-body">
+            <!-- Parts will be added here -->
+          </tbody>
+        </table>
+        <div id="empty-state" class="empty-state">
+          <p>No parts added to count list yet.</p>
+          <p>Scan a barcode or enter a part ID to add parts.</p>
+        </div>
+      </div>
+      
+      <div class="actions">
+        <button id="save-counts-btn" class="button" disabled>Save All Counts</button>
+        <button id="clear-counts-btn" class="button button-secondary" disabled>Clear All</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="notifications" class="notifications"></div>
+  
+  <script>
+    // Store the parts list for the current session
+    let countList = [];
+    
+    // DOM elements
+    const partIdInput = document.getElementById('part-id');
+    const quantityInput = document.getElementById('quantity');
+    const addPartBtn = document.getElementById('add-part-btn');
+    const toggleScannerBtn = document.getElementById('toggle-scanner-btn');
+    const readerContainer = document.getElementById('reader-container');
+    const reader = document.getElementById('reader');
+    const cameraSelect = document.getElementById('camera-select');
+    const countListBody = document.getElementById('count-list-body');
+    const emptyState = document.getElementById('empty-state');
+    const saveCountsBtn = document.getElementById('save-counts-btn');
+    const clearCountsBtn = document.getElementById('clear-counts-btn');
+    const notificationsContainer = document.getElementById('notifications');
+    
+    // Variables for barcode scanner
+    let html5QrcodeScanner = null;
+    let currentScanner = null;
+    let scannerActive = false;
+    let cameras = [];
+    let selectedCamera = null;
+    
+    // Show notification
+    function showNotification(type, title, message, duration = 3000) {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      
+      notification.innerHTML = `
+        <div class="notification-content">
+          <div class="notification-title">${title}</div>
+          ${message ? `<div class="notification-message">${message}</div>` : ''}
+        </div>
+        <button class="notification-close">&times;</button>
+      `;
+      
+      notificationsContainer.appendChild(notification);
+      
+      // Close button functionality
+      const closeBtn = notification.querySelector('.notification-close');
+      closeBtn.addEventListener('click', () => {
+        notification.classList.add('slide-out');
+        setTimeout(() => notification.remove(), 300);
+      });
+      
+      // Auto-remove after duration
+      if (duration) {
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.classList.add('slide-out');
+            setTimeout(() => notification.remove(), 300);
+          }
+        }, duration);
+      }
+      
+      return notification;
+    }
+    
+    // Format availability as a badge
+    function formatAvailability(availability) {
+      return `<span class="status-badge ${availability.toLowerCase()}">${availability}</span>`;
+    }
+    
+    // Update the count list table
+    function updateCountList() {
+      if (countList.length === 0) {
+        emptyState.style.display = 'block';
+        saveCountsBtn.disabled = true;
+        clearCountsBtn.disabled = true;
+      } else {
+        emptyState.style.display = 'none';
+        saveCountsBtn.disabled = false;
+        clearCountsBtn.disabled = false;
+        
+        countListBody.innerHTML = '';
+        countList.forEach((item, index) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.partId}</td>
+            <td>${item.name || item.partId}</td>
+            <td>${item.description || ''}</td>
+            <td class="quantity-cell">
+              <button class="icon-button decrease-btn" data-index="${index}">-</button>
+              <input type="number" class="quantity-input" value="${item.quantity}" min="1" data-index="${index}">
+              <button class="icon-button increase-btn" data-index="${index}">+</button>
+            </td>
+            <td>
+              <button class="icon-button remove-btn" data-index="${index}">Remove</button>
+            </td>
+          `;
+          countListBody.appendChild(tr);
+        });
+        
+        // Add event listeners to buttons and inputs
+        document.querySelectorAll('.decrease-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const index = e.target.getAttribute('data-index');
+            if (countList[index].quantity > 1) {
+              countList[index].quantity--;
+              updateCountList();
+            }
+          });
+        });
+        
+        document.querySelectorAll('.increase-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const index = e.target.getAttribute('data-index');
+            countList[index].quantity++;
+            updateCountList();
+          });
+        });
+        
+        document.querySelectorAll('.quantity-input').forEach(input => {
+          input.addEventListener('change', (e) => {
+            const index = e.target.getAttribute('data-index');
+            const newQuantity = parseInt(e.target.value, 10);
+            if (newQuantity >= 1) {
+              countList[index].quantity = newQuantity;
+            } else {
+              e.target.value = countList[index].quantity;
+            }
+          });
+        });
+        
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const index = e.target.getAttribute('data-index');
+            countList.splice(index, 1);
+            updateCountList();
+          });
+        });
+      }
+    }
+    
+    // Initialize camera list
+    async function initializeCameras() {
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        cameras = devices;
+        
+        if (cameras.length === 0) {
+          cameraSelect.innerHTML = '<option value="">No cameras found</option>';
+          return false;
+        }
+        
+        cameraSelect.innerHTML = '';
+        cameras.forEach(camera => {
+          const option = document.createElement('option');
+          option.value = camera.id;
+          option.text = camera.label || `Camera ${camera.id}`;
+          cameraSelect.appendChild(option);
+        });
+        
+        // Select rear camera by default if available
+        const rearCamera = cameras.find(camera => 
+          camera.label && (
+            camera.label.toLowerCase().includes('back') || 
+            camera.label.toLowerCase().includes('rear')
+          )
+        );
+        
+        if (rearCamera) {
+          cameraSelect.value = rearCamera.id;
+          selectedCamera = rearCamera.id;
+        } else {
+          selectedCamera = cameras[0].id;
+        }
+        
+        return true;
+      } catch (err) {
+        console.error('Error getting cameras:', err);
+        cameraSelect.innerHTML = '<option value="">Error accessing cameras</option>';
+        return false;
+      }
+    }
+    
+    // Start barcode scanner
+    async function startScanner() {
+      if (!selectedCamera) {
+        const hasCamera = await initializeCameras();
+        if (!hasCamera) {
+          showNotification('error', 'Camera Error', 'No cameras available or camera access denied.');
+          return;
+        }
+      }
+      
+      if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+      }
+      
+      html5QrcodeScanner = new Html5Qrcode('reader');
+      
+      html5QrcodeScanner.start(
+        selectedCamera,
+        {
+          fps: 10,
+          qrbox: { width: 250, height: 150 }
+        },
+        (decodedText) => {
+          // On successful scan
+          partIdInput.value = decodedText;
+          
+          // Fetch part information
+          findPartByPartId(decodedText)
+            .then(part => {
+              if (part) {
+                // Add part to list
+                const existingPartIndex = countList.findIndex(item => item.partId === part.partId);
+                
+                if (existingPartIndex !== -1) {
+                  // Part already in list, increase quantity
+                  countList[existingPartIndex].quantity += parseInt(quantityInput.value, 10);
+                } else {
+                  // Add new part to list
+                  countList.push({
+                    ...part,
+                    quantity: parseInt(quantityInput.value, 10)
+                  });
+                }
+                
+                updateCountList();
+                showNotification('success', 'Part Scanned', `Added ${part.name || part.partId}`);
+              } else {
+                showNotification('error', 'Part Not Found', `No part found with ID ${decodedText}`);
+              }
+            })
+            .catch(err => {
+              console.error('Error finding part:', err);
+              showNotification('error', 'Error', 'Failed to process barcode.');
+            });
+          
+          // Stop scanner after successful scan
+          html5QrcodeScanner.stop()
+            .then(() => {
+              scannerActive = false;
+              toggleScannerBtn.textContent = 'Scan Barcode';
+              readerContainer.style.display = 'none';
+            })
+            .catch(err => console.error('Error stopping scanner:', err));
+        },
+        (errorMessage) => {
+          // On error - don't need to show these to user
+          console.log('QR Code scanning error:', errorMessage);
+        }
+      ).catch(err => {
+        console.error('Error starting scanner:', err);
+        showNotification('error', 'Camera Error', 'Failed to start the camera.');
+      });
+    }
+    
+    // Toggle barcode scanner
+    async function toggleScanner() {
+      if (scannerActive) {
+        // Stop the scanner
+        if (html5QrcodeScanner) {
+          html5QrcodeScanner.stop()
+            .then(() => {
+              scannerActive = false;
+              toggleScannerBtn.textContent = 'Scan Barcode';
+              readerContainer.style.display = 'none';
+            })
+            .catch(err => console.error('Error stopping scanner:', err));
+        }
+      } else {
+        // Start the scanner
+        readerContainer.style.display = 'block';
+        toggleScannerBtn.textContent = 'Stop Scanning';
+        scannerActive = true;
+        startScanner();
+      }
+    }
+    
+    // Fetch part by partId
+    async function findPartByPartId(partId) {
+      try {
+        // Simulated part data for standalone version
+        // In a real application, this would make a fetch request to the API
+        const parts = [
+          { id: 1, partId: '150006', name: '#10 Self Drilling Screws', description: '1-1/2" length', quantity: 500, reorderLevel: 100 },
+          { id: 2, partId: '150007', name: '#12 Self Drilling Screws', description: '2" length', quantity: 350, reorderLevel: 100 },
+          { id: 3, partId: '150008', name: '#8 Self Drilling Screws', description: '1" length', quantity: 200, reorderLevel: 100 },
+          { id: 4, partId: '150009', name: 'Drywall Screws', description: '1-5/8" length', quantity: 800, reorderLevel: 200 },
+          { id: 5, partId: '150010', name: 'Wood Screws', description: '2-1/2" length', quantity: 600, reorderLevel: 150 },
+          { id: 6, partId: 'DL4R', name: 'Door Lock - Right Hand', description: 'For classroom doors', quantity: 25, reorderLevel: 10 },
+          { id: 7, partId: 'DL4L', name: 'Door Lock - Left Hand', description: 'For classroom doors', quantity: 25, reorderLevel: 10 },
+          { id: 8, partId: 'LB100', name: 'Light Bulb - LED', description: '60W equivalent', quantity: 120, reorderLevel: 40 }
+        ];
+        
+        // Find part by partId
+        const part = parts.find(p => p.partId === partId);
+        return part || null;
+      } catch (error) {
+        console.error('Error finding part:', error);
+        return null;
+      }
+    }
+    
+    // Save counts to backend
+    async function saveCounts() {
+      // In a real app, this would send data to the backend
+      saveCountsBtn.disabled = true;
+      
+      // Add loading spinner to button
+      const originalButtonText = saveCountsBtn.textContent;
+      saveCountsBtn.innerHTML = 'Saving... <span class="spinner"></span>';
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        // Reset button state
+        saveCountsBtn.disabled = false;
+        saveCountsBtn.textContent = originalButtonText;
+        
+        // Show success notification
+        showNotification('success', 'Success', `Updated ${countList.length} parts successfully.`);
+        
+        // Clear the count list
+        countList = [];
+        updateCountList();
+      }, 1500);
+    }
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize empty state
+      updateCountList();
+      
+      // Add part button click
+      addPartBtn.addEventListener('click', async () => {
+        const partId = partIdInput.value.trim();
+        if (!partId) {
+          showNotification('error', 'Error', 'Please enter a Part ID.');
+          return;
+        }
+        
+        const quantity = parseInt(quantityInput.value, 10);
+        if (isNaN(quantity) || quantity < 1) {
+          showNotification('error', 'Error', 'Please enter a valid quantity.');
+          return;
+        }
+        
+        const part = await findPartByPartId(partId);
+        if (part) {
+          const existingPartIndex = countList.findIndex(item => item.partId === part.partId);
+          
+          if (existingPartIndex !== -1) {
+            // Part already in list, increase quantity
+            countList[existingPartIndex].quantity += quantity;
+          } else {
+            // Add new part to list
+            countList.push({
+              ...part,
+              quantity
+            });
+          }
+          
+          updateCountList();
+          partIdInput.value = '';
+          quantityInput.value = '1';
+          partIdInput.focus();
+          
+          showNotification('success', 'Part Added', `Added ${part.name || part.partId}`);
+        } else {
+          showNotification('error', 'Part Not Found', `No part found with ID ${partId}`);
+        }
+      });
+      
+      // Toggle scanner button click
+      toggleScannerBtn.addEventListener('click', toggleScanner);
+      
+      // Camera select change
+      cameraSelect.addEventListener('change', (e) => {
+        selectedCamera = e.target.value;
+        if (scannerActive) {
+          // Restart scanner with new camera
+          if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop()
+              .then(() => {
+                startScanner();
+              })
+              .catch(err => console.error('Error stopping scanner:', err));
+          }
+        }
+      });
+      
+      // Save counts button click
+      saveCountsBtn.addEventListener('click', saveCounts);
+      
+      // Clear counts button click
+      clearCountsBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all counts?')) {
+          countList = [];
+          updateCountList();
+        }
+      });
+      
+      // Part ID input - allow enter key to submit
+      partIdInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          addPartBtn.click();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

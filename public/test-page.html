@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONU Parts Tracker - Test Page</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f8f8f8;
+    }
+    .redirect-container {
+      text-align: center;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      max-width: 90%;
+    }
+    .spinner {
+      border: 4px solid rgba(243, 101, 50, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #F36532;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 1rem auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    h1 {
+      color: #F36532;
+      margin-bottom: 1rem;
+    }
+    p {
+      margin-bottom: 1rem;
+      color: #555;
+    }
+    .manual-link {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #F36532;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="redirect-container">
+    <h1>ONU Parts Tracker</h1>
+    <p>Redirecting to test page...</p>
+    <div class="spinner"></div>
+    <p>If you are not redirected automatically, <a href="/test-page" id="testPageLink" class="manual-link">click here</a>.</p>
+  </div>
+
+  <script>
+    // Add a small delay before redirecting
+    setTimeout(function() {
+      // Try to use the SPA router by modifying history
+      if (window.history && window.history.pushState) {
+        window.history.pushState({}, 'Test Page', '/test-page');
+        
+        // Also try dispatching a custom event to help navigate
+        window.dispatchEvent(new CustomEvent('spanavigate', { 
+          detail: { url: '/test-page' } 
+        }));
+        
+        // Reload to make sure we get the right page
+        window.location.reload();
+      } else {
+        // Fallback to direct navigation
+        window.location.href = '/test-page';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

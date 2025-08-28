@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONU Parts Tracker - Login</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    .container {
+      max-width: 450px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo {
+      max-width: 150px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      text-align: center;
+      color: #F36532;
+      margin-bottom: 5px;
+    }
+    p.subtitle {
+      text-align: center;
+      color: #777;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+    .login-form {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .btn {
+      background-color: #F36532;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      box-shadow: 0 2px 5px rgba(243, 101, 50, 0.3);
+    }
+    .btn:hover {
+      background-color: #e55a28;
+    }
+    .option-toggle {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .option-toggle a {
+      color: #F36532;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .loading-indicator {
+      display: none;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .spinner {
+      width: 25px;
+      height: 25px;
+      border: 3px solid rgba(243, 101, 50, 0.3);
+      border-top: 3px solid #F36532;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <img src="/onu-logo.svg" alt="ONU Logo" class="logo">
+      <h1>ONU Parts Tracker</h1>
+      <p class="subtitle">Inventory Management System</p>
+    </div>
+
+    <div class="login-form">
+      <div id="technician-form">
+        <h3>Technician Login</h3>
+        <div class="form-group">
+          <label for="technician-name">Your Name</label>
+          <input type="text" id="technician-name" name="name" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input type="text" id="department" name="department" placeholder="Optional - Department">
+        </div>
+        <button type="button" id="tech-login-btn" class="btn">Login as Technician</button>
+        <div id="tech-loading" class="loading-indicator">
+          <div class="spinner"></div>
+          <span>Logging in...</span>
+        </div>
+      </div>
+
+      <div id="admin-form" style="display: none;">
+        <h3>Administrator Login</h3>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required placeholder="Enter your username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required placeholder="Enter your password">
+        </div>
+        <button type="button" id="admin-login-btn" class="btn">Login as Administrator</button>
+        <div id="admin-loading" class="loading-indicator">
+          <div class="spinner"></div>
+          <span>Logging in...</span>
+        </div>
+      </div>
+
+      <div class="option-toggle">
+        <a href="#" id="toggle-mode">Switch to Administrator Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggleBtn = document.getElementById('toggle-mode');
+      const techForm = document.getElementById('technician-form');
+      const adminForm = document.getElementById('admin-form');
+      const techLoginBtn = document.getElementById('tech-login-btn');
+      const adminLoginBtn = document.getElementById('admin-login-btn');
+      const techLoading = document.getElementById('tech-loading');
+      const adminLoading = document.getElementById('admin-loading');
+      
+      // Toggle between technician and admin login forms
+      toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (techForm.style.display !== 'none') {
+          techForm.style.display = 'none';
+          adminForm.style.display = 'block';
+          toggleBtn.textContent = 'Switch to Technician Login';
+        } else {
+          techForm.style.display = 'block';
+          adminForm.style.display = 'none';
+          toggleBtn.textContent = 'Switch to Administrator Login';
+        }
+      });
+      
+      // Technician login handler
+      techLoginBtn.addEventListener('click', function() {
+        const name = document.getElementById('technician-name').value.trim();
+        const department = document.getElementById('department').value.trim();
+        
+        if (!name) {
+          alert('Please enter your name');
+          return;
+        }
+        
+        // Show loading indicator
+        techLoginBtn.style.display = 'none';
+        techLoading.style.display = 'block';
+        
+        // Submit the form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/login';
+        
+        // Add name field
+        const nameField = document.createElement('input');
+        nameField.type = 'hidden';
+        nameField.name = 'name';
+        nameField.value = name;
+        form.appendChild(nameField);
+        
+        // Add department field if provided
+        if (department) {
+          const deptField = document.createElement('input');
+          deptField.type = 'hidden';
+          deptField.name = 'department';
+          deptField.value = department;
+          form.appendChild(deptField);
+        }
+        
+        // Add role field
+        const roleField = document.createElement('input');
+        roleField.type = 'hidden';
+        roleField.name = 'role';
+        roleField.value = 'technician';
+        form.appendChild(roleField);
+        
+        // Add redirect field
+        const redirectField = document.createElement('input');
+        redirectField.type = 'hidden';
+        redirectField.name = 'redirect';
+        redirectField.value = '/technician';
+        form.appendChild(redirectField);
+        
+        // Append form to body and submit
+        document.body.appendChild(form);
+        form.submit();
+      });
+      
+      // Admin login handler
+      adminLoginBtn.addEventListener('click', function() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if (!username || !password) {
+          alert('Please enter both username and password');
+          return;
+        }
+        
+        // Show loading indicator
+        adminLoginBtn.style.display = 'none';
+        adminLoading.style.display = 'block';
+        
+        // Submit the form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/api/login';
+        
+        // Add username field
+        const usernameField = document.createElement('input');
+        usernameField.type = 'hidden';
+        usernameField.name = 'username';
+        usernameField.value = username;
+        form.appendChild(usernameField);
+        
+        // Add password field
+        const passwordField = document.createElement('input');
+        passwordField.type = 'hidden';
+        passwordField.name = 'password';
+        passwordField.value = password;
+        form.appendChild(passwordField);
+        
+        // Add role field
+        const roleField = document.createElement('input');
+        roleField.type = 'hidden';
+        roleField.name = 'role';
+        roleField.value = 'admin';
+        form.appendChild(roleField);
+        
+        // Add redirect field
+        const redirectField = document.createElement('input');
+        redirectField.type = 'hidden';
+        redirectField.name = 'redirect';
+        redirectField.value = '/dashboard';
+        form.appendChild(redirectField);
+        
+        // Append form to body and submit
+        document.body.appendChild(form);
+        form.submit();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f5f5f5;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      background-color: #F36532;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    .container {
+      flex: 1;
+      padding: 15px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin: 15px 0 10px 0;
+      color: #F36532;
+    }
+    .login-form {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .btn {
+      background-color: #F36532;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #e55a28;
+    }
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid #F36532;
+      color: #F36532;
+    }
+    .btn-outline:hover {
+      background-color: #fff8f5;
+    }
+    .parts-list {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .parts-item {
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .part-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    .part-details {
+      font-size: 14px;
+      color: #666;
+      margin: 2px 0;
+    }
+    .parts-item:last-child {
+      border-bottom: none;
+    }
+    /* These styles are defined above, removed duplicate declarations */
+    .part-quantity {
+      margin-top: 5px;
+      font-weight: 500;
+    }
+    .quantity-available {
+      color: #2a9d49;
+    }
+    .quantity-low {
+      color: #d97706;
+    }
+    .quantity-empty {
+      color: #dc2626;
+    }
+    .issue-form {
+      display: none;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 30px 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: #F36532;
+    }
+    .loading {
+      text-align: center;
+      padding: 30px;
+    }
+    .spinner {
+      border: 4px solid rgba(243, 101, 50, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #F36532;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error {
+      color: #dc2626;
+      font-size: 0.9rem;
+      margin-top: 5px;
+    }
+    .logout-btn {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .user-info {
+      font-size: 0.9rem;
+      margin-top: 5px;
+      opacity: 0.9;
+    }
+    .recent-issuance {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .recent-issuance table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .recent-issuance th {
+      text-align: left;
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-weight: 500;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .recent-issuance td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.9rem;
+    }
+    .recent-issuance tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div style="height: 60px;">
+      <img src="/external-logo.png" alt="Logo" style="height: 100%;" />
+    </div>
+    <div class="user-info" id="user-name"></div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="container">
+    <!-- Login Form -->
+    <div id="login-section" class="login-form">
+      <h2>Technician Login</h2>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input type="text" id="department" name="department" placeholder="Optional - Department">
+        </div>
+        <button type="submit" class="btn">Login as Technician</button>
+      </form>
+    </div>
+
+    <!-- Main Content (initially hidden) -->
+    <div id="main-content" style="display: none;">
+      <div class="button-group" style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <button id="issue-btn" class="btn">Issue Parts</button>
+        <button id="view-techs-btn" class="btn btn-outline">View Technicians</button>
+      </div>
+      
+      <!-- Technicians List (initially hidden) -->
+      <div id="technicians-section" style="display: none;">
+        <h2>Technicians</h2>
+        <div id="technicians-container" class="parts-list">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading technicians...</p>
+          </div>
+        </div>
+        <button class="btn btn-outline" id="close-techs-btn" style="margin-top: 15px;">Close</button>
+      </div>
+      
+      <!-- Issue Parts Form (initially hidden) -->
+      <div id="issue-form" class="issue-form">
+        <h2>Issue Parts</h2>
+        <form id="part-issue-form">
+          <div class="form-group">
+            <label for="part-select">Part</label>
+            <select id="part-select" name="partId" required>
+              <option value="">Select part</option>
+            </select>
+            <div id="part-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="quantity-input">Quantity</label>
+            <input type="number" id="quantity-input" name="quantity" min="1" required placeholder="Quantity">
+            <div id="quantity-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="building-select">Building</label>
+            <select id="building-select" name="building" required>
+              <option value="">Select building</option>
+            </select>
+            <div id="building-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="issued-to-select">Issued To</label>
+            <select id="issued-to-select" name="issuedTo" required>
+              <option value="">Select person</option>
+            </select>
+            <div id="issued-to-error" class="error"></div>
+          </div>
+          <div class="form-group">
+            <label for="cost-center-input">Cost Center</label>
+            <input type="text" id="cost-center-input" name="costCenter" placeholder="Optional - Cost Center">
+          </div>
+          <div class="form-group">
+            <label for="notes-input">Notes</label>
+            <input type="text" id="notes-input" name="notes" placeholder="Optional - Notes">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn">Submit</button>
+            <button type="button" class="btn btn-outline" id="cancel-issue">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Recent Issuance -->
+      <h2>Recent Parts Issued</h2>
+      <div id="recent-issuance-container" class="recent-issuance">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Loading recent parts issuance...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Variables to store data
+    let currentUser = null;
+    let parts = [];
+    let buildings = [];
+    let technicians = [];
+    let recentIssuance = [];
+
+    // Check if user is already authenticated
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/current-user');
+        if (response.ok) {
+          currentUser = await response.json();
+          document.getElementById('user-name').textContent = currentUser.name;
+          return true;
+        } else {
+          return false;
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+      }
+    }
+    
+    // Initialize page
+    async function initPage() {
+      const isAuthenticated = await checkAuth();
+      
+      if (isAuthenticated) {
+        // User is authenticated, show main content
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        fetchData();
+      } else {
+        // User is not authenticated, show login form
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('main-content').style.display = 'none';
+      }
+    }
+    
+    // Fetch data from API
+    async function fetchData() {
+      try {
+        // Load parts
+        const partsResponse = await fetch('/api/parts');
+        if (partsResponse.ok) {
+          parts = await partsResponse.json();
+          populatePartSelect();
+        }
+        
+        // Load buildings
+        const buildingsResponse = await fetch('/api/buildings');
+        if (buildingsResponse.ok) {
+          buildings = await buildingsResponse.json();
+          populateBuildingSelect();
+        }
+        
+        // Load technicians - use the public endpoint that now returns all users
+        try {
+          const techniciansResponse = await fetch('/api/technicians-list');
+          if (techniciansResponse.ok) {
+            technicians = await techniciansResponse.json();
+            console.log("Loaded technicians:", technicians.length);
+            
+            // Update UI with technician data
+            populateTechnicianSelect();
+            
+            // Also update the technicians view if it's visible
+            if (document.getElementById('technicians-section').style.display === 'block') {
+              renderTechnicians();
+            }
+          } else {
+            console.error("Failed to load technicians:", techniciansResponse.status);
+          }
+        } catch (error) {
+          console.error("Error loading technicians:", error);
+        }
+        
+        // Load recent issuance
+        const issuanceResponse = await fetch('/api/parts-issuance/recent');
+        if (issuanceResponse.ok) {
+          recentIssuance = await issuanceResponse.json();
+          renderRecentIssuance();
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    }
+    
+    // Populate part select dropdown
+    function populatePartSelect() {
+      const select = document.getElementById('part-select');
+      select.innerHTML = '<option value="">Select part</option>';
+      
+      // Sort parts by name
+      parts.sort((a, b) => a.name.localeCompare(b.name));
+      
+      parts.forEach(part => {
+        if (part.quantity > 0) {
+          const option = document.createElement('option');
+          option.value = part.id;
+          option.textContent = `${part.name} - ${part.partId} (${part.quantity} available)`;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Populate building select dropdown
+    function populateBuildingSelect() {
+      const select = document.getElementById('building-select');
+      select.innerHTML = '<option value="">Select building</option>';
+      
+      buildings.forEach(building => {
+        const option = document.createElement('option');
+        option.value = building.name;
+        option.textContent = building.name;
+        select.appendChild(option);
+      });
+      
+      // Add 'Other' option if no buildings
+      if (buildings.length === 0) {
+        const option = document.createElement('option');
+        option.value = 'Other';
+        option.textContent = 'Other';
+        select.appendChild(option);
+      }
+    }
+    
+    // Populate technician select dropdown
+    function populateTechnicianSelect() {
+      const select = document.getElementById('issued-to-select');
+      select.innerHTML = '<option value="">Select person</option>';
+      
+      // Add current user as first option
+      if (currentUser) {
+        const option = document.createElement('option');
+        option.value = currentUser.name;
+        option.textContent = `${currentUser.name} (You)`;
+        select.appendChild(option);
+        
+        // Set current user as default selected
+        select.value = currentUser.name;
+      }
+      
+      // Add other technicians
+      technicians.forEach(tech => {
+        if (!currentUser || tech.name !== currentUser.name) {
+          const option = document.createElement('option');
+          option.value = tech.name;
+          option.textContent = `${tech.name}${tech.department ? ` - ${tech.department}` : ''}`;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Render recent issuance table
+    function renderRecentIssuance() {
+      const container = document.getElementById('recent-issuance-container');
+      
+      if (recentIssuance.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No parts have been issued yet</h3>
+            <p>Start issuing parts by clicking the "Issue Parts" button.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Create table HTML
+      let tableHtml = `
+        <table>
+          <thead>
+            <tr>
+              <th>Part ID</th>
+              <th>Part Name</th>
+              <th>Qty</th>
+              <th>Building</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      // Add rows
+      recentIssuance.forEach(issuance => {
+        tableHtml += `
+          <tr>
+            <td>${issuance.part.partId}</td>
+            <td>${issuance.part.name}</td>
+            <td>${issuance.quantity}</td>
+            <td>${issuance.projectCode || issuance.reason}</td>
+            <td>${new Date(issuance.issuedAt).toLocaleDateString()}</td>
+          </tr>
+        `;
+      });
+      
+      tableHtml += `
+          </tbody>
+        </table>
+      `;
+      
+      container.innerHTML = tableHtml;
+    }
+    
+    // Handle login form submission
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const department = document.getElementById('department').value.trim();
+      
+      if (!name) {
+        alert('Please enter your name');
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: name,
+            department: department,
+            role: 'technician'
+          })
+        });
+        
+        if (response.ok) {
+          currentUser = await response.json();
+          document.getElementById('user-name').textContent = currentUser.name;
+          
+          // Show main content, hide login form
+          document.getElementById('login-section').style.display = 'none';
+          document.getElementById('main-content').style.display = 'block';
+          
+          // Fetch data
+          fetchData();
+        } else {
+          const errorData = await response.json();
+          alert(`Login failed: ${errorData.error || 'Unknown error'}`);
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('Failed to login. Please try again.');
+      }
+    });
+    
+    // Toggle issue form visibility
+    document.getElementById('issue-btn').addEventListener('click', function() {
+      document.getElementById('issue-form').style.display = 'block';
+    });
+    
+    // Cancel issue form
+    document.getElementById('cancel-issue').addEventListener('click', function() {
+      document.getElementById('issue-form').style.display = 'none';
+      clearFormErrors();
+    });
+    
+    // Clear form errors
+    function clearFormErrors() {
+      const errorElements = document.querySelectorAll('.error');
+      errorElements.forEach(el => el.textContent = '');
+    }
+    
+    // Handle issue form submission
+    document.getElementById('part-issue-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearFormErrors();
+      
+      // Validate form
+      const partId = parseInt(document.getElementById('part-select').value);
+      const quantity = parseInt(document.getElementById('quantity-input').value);
+      const building = document.getElementById('building-select').value;
+      const issuedTo = document.getElementById('issued-to-select').value;
+      const costCenter = document.getElementById('cost-center-input').value;
+      const notes = document.getElementById('notes-input').value;
+      
+      let isValid = true;
+      
+      if (!partId) {
+        document.getElementById('part-error').textContent = 'Please select a part';
+        isValid = false;
+      }
+      
+      if (!quantity || quantity < 1) {
+        document.getElementById('quantity-error').textContent = 'Quantity must be at least 1';
+        isValid = false;
+      }
+      
+      if (!building) {
+        document.getElementById('building-error').textContent = 'Please select a building';
+        isValid = false;
+      }
+      
+      if (!issuedTo) {
+        document.getElementById('issued-to-error').textContent = 'Please select who is receiving the part';
+        isValid = false;
+      }
+      
+      if (!isValid) return;
+      
+      // Prepare data for submission
+      const submitData = {
+        partId,
+        quantity,
+        building,
+        issuedTo,
+        reason: 'other', // Always use "other" for compatibility
+        projectCode: building, // Store building in projectCode for tracking
+      };
+      
+      // Add optional fields if provided
+      if (costCenter) submitData.costCenter = costCenter;
+      if (notes) submitData.notes = notes;
+      
+      try {
+        const response = await fetch('/api/parts-issuance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(submitData)
+        });
+        
+        if (response.ok) {
+          alert('Part issued successfully!');
+          document.getElementById('issue-form').style.display = 'none';
+          document.getElementById('part-issue-form').reset();
+          
+          // Refresh data
+          fetchData();
+        } else {
+          const error = await response.text();
+          alert(`Failed to issue part: ${error}`);
+        }
+      } catch (error) {
+        console.error('Error issuing part:', error);
+        alert('Failed to issue part. Please try again.');
+      }
+    });
+    
+    // Render technicians list
+    function renderTechnicians() {
+      console.log("Rendering technicians, count:", technicians?.length || 0);
+      const container = document.getElementById('technicians-container');
+      
+      if (!technicians || technicians.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">👤</div>
+            <h3>No technicians found</h3>
+            <p>There are no technicians in the system yet.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      try {
+        // Sort technicians by name
+        technicians.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Create HTML for technicians list
+        let techHtml = '';
+        
+        technicians.forEach(tech => {
+          techHtml += `
+            <div class="parts-item">
+              <div class="part-name">${tech.name || 'Unknown'}</div>
+              ${tech.department ? `<div class="part-details">Department: ${tech.department}</div>` : ''}
+              <div class="part-details">Username: ${tech.username || 'N/A'}</div>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = techHtml;
+        console.log("Technicians rendering complete");
+      } catch (error) {
+        console.error("Error rendering technicians:", error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <h3>Error Displaying Technicians</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Toggle technicians section visibility
+    document.getElementById('view-techs-btn').addEventListener('click', function() {
+      console.log("View technicians button clicked");
+      document.getElementById('technicians-section').style.display = 'block';
+      document.getElementById('issue-form').style.display = 'none';
+      
+      // Fetch the latest technicians data and render it
+      fetch('/api/technicians-list')
+        .then(response => {
+          if (response.ok) return response.json();
+          throw new Error(`Failed to load technicians: ${response.status}`);
+        })
+        .then(data => {
+          console.log(`Fetched ${data.length} technicians directly`);
+          technicians = data;
+          renderTechnicians();
+        })
+        .catch(error => {
+          console.error("Error loading technicians:", error);
+          document.getElementById('technicians-container').innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">⚠️</div>
+              <h3>Error Loading Technicians</h3>
+              <p>${error.message}</p>
+            </div>
+          `;
+        });
+    });
+    
+    // Close technicians section
+    document.getElementById('close-techs-btn').addEventListener('click', function() {
+      document.getElementById('technicians-section').style.display = 'none';
+    });
+    
+    // Handle logout
+    function logout() {
+      fetch('/api/logout', { method: 'POST' })
+        .then(() => {
+          // Redirect to the login section of this page
+          document.getElementById('login-section').style.display = 'block';
+          document.getElementById('main-content').style.display = 'none';
+          currentUser = null;
+          document.getElementById('user-name').textContent = '';
+        })
+        .catch(err => {
+          console.error('Logout error:', err);
+          alert('Failed to logout. Please try again.');
+        });
+    }
+    
+    // Initialize page
+    window.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html>

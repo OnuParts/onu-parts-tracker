@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body { font-family: Arial; margin: 0; padding: 0; background: #f5f5f5; }
+        .header { background: #F36532; color: white; padding: 15px; text-align: center; }
+        .container { padding: 15px; }
+        .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat { font-size: 24px; font-weight: bold; color: #F36532; }
+        .nav { display: flex; justify-content: space-around; background: white; padding: 10px; border-top: 1px solid #ddd; position: fixed; bottom: 0; width: 100%; }
+        .nav a { color: #666; text-decoration: none; padding: 5px; }
+        .nav a.active { color: #F36532; font-weight: bold; }
+        h2 { margin-top: 0; color: #444; }
+        .recent-list { margin-top: 10px; }
+        .recent-item { border-bottom: 1px solid #eee; padding: 8px 0; }
+        .logout { background: #eee; color: #666; border: none; padding: 8px 15px; border-radius: 4px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="height: 35px; text-align: center;">
+            <img src="/external-logo.png" alt="Logo" style="height: 100%;" />
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Overview</h2>
+            <div id="stats-container">
+                <p>Total Parts: <span class="stat" id="total-parts">Loading...</span></p>
+                <p>Low Stock Items: <span class="stat" id="low-stock">Loading...</span></p>
+                <p>Monthly Issuances: <span class="stat" id="monthly-issuance">Loading...</span></p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Recent Parts Issuance</h2>
+            <div class="recent-list" id="recent-issuance">
+                Loading recent issuances...
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Low Stock Items</h2>
+            <div class="recent-list" id="low-stock-items">
+                Loading low stock items...
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; display: flex; justify-content: space-between;">
+            <form action="/api/logout" method="post">
+                <button type="submit" class="logout">Logout</button>
+            </form>
+            
+            <a href="/dashboard" style="display: inline-block; padding: 8px 15px; background: #F36532; color: white; text-decoration: none; border-radius: 4px;">Full Dashboard</a>
+        </div>
+        
+        <div style="height: 60px;"><!-- Spacer for fixed nav --></div>
+    </div>
+    
+    <div class="nav">
+        <a href="/dashboard-simple" class="active">Dashboard</a>
+        <a href="/parts-inventory">Inventory</a>
+        <a href="/parts-issuance">Issuance</a>
+        <a href="/settings">Settings</a>
+    </div>
+    
+    <script>
+        // Fetch statistics
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('total-parts').textContent = data.totalParts;
+                document.getElementById('low-stock').textContent = data.lowStockItemsCount;
+                document.getElementById('monthly-issuance').textContent = data.totalPartsIssuance;
+            })
+            .catch(error => {
+                console.error('Error fetching stats:', error);
+                document.getElementById('stats-container').innerHTML = '<p>Error loading statistics</p>';
+            });
+            
+        // Fetch recent issuances directly from the database
+        fetch('/api/parts-issuance/recent')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('API response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const container = document.getElementById('recent-issuance');
+                if (data && data.length > 0) {
+                    let html = '';
+                    // Only show the most recent 3 issuances
+                    data.slice(0, 3).forEach(item => {
+                        // Get the actual part name from the API response
+                        let partName = "Unknown Part";
+                        
+                        // Try to find the part name from the database
+                        if (item.part && item.part.name) {
+                            partName = item.part.name;
+                        }
+                        
+                        html += `<div class="recent-item">
+                            <strong>${partName}</strong> (${item.quantity} units)
+                            <div>Issued to: ${item.issuedTo || "Unknown"}</div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    // If no data, let's fetch parts directly as a fallback
+                    fetch('/api/parts?limit=3')
+                        .then(response => response.json())
+                        .then(parts => {
+                            if (parts && parts.length > 0) {
+                                let html = '';
+                                parts.slice(0, 3).forEach(part => {
+                                    html += `<div class="recent-item">
+                                        <strong>${part.name || 'Part #' + part.partId}</strong>
+                                        <div>Available: ${part.quantity} units</div>
+                                    </div>`;
+                                });
+                                container.innerHTML = html;
+                            } else {
+                                container.innerHTML = '<p>No recent issuances</p>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching parts:', error);
+                            container.innerHTML = '<p>Unable to load parts data</p>';
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching recent issuances:', error);
+                document.getElementById('recent-issuance').innerHTML = '<p>Error loading recent issuances</p>';
+            });
+            
+        // Fetch low stock items
+        fetch('/api/parts/low-stock')
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('low-stock-items');
+                if (data && data.length > 0) {
+                    let html = '';
+                    // Only show the top 3 low stock items
+                    data.slice(0, 3).forEach(item => {
+                        const name = item.name || "Part #" + item.partId;
+                        html += `<div class="recent-item">
+                            <strong>${name}</strong>
+                            <div>Quantity: ${item.quantity} (Min: ${item.minQuantity || 'N/A'})</div>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p>No low stock items</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching low stock items:', error);
+                document.getElementById('low-stock-items').innerHTML = '<p>Error loading low stock items</p>';
+            });
+    </script>
+</body>
+</html>
