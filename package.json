@@ -1,14 +1,72 @@
 {
   "name": "onu-parts-tracker",
   "version": "1.0.0",
-  "main": "server.js",
+  "description": "Ohio Northern University Parts Tracker - Complete deployment version",
+  "main": "server-simple.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server-simple.js",
+    "build": "echo 'Server build complete'",
+    "build:frontend": "cd client && npm install && npm run build",
+    "dev": "node server-simple.js",
+    "vercel-build": "npm run build:frontend",
+    "db:push": "npx drizzle-kit push:pg",
+    "db:studio": "npx drizzle-kit studio"
   },
+  "keywords": ["inventory", "parts", "tracking", "university"],
+  "author": "Ohio Northern University",
+  "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.11.0",
+    "drizzle-orm": "^0.28.5",
+    "drizzle-kit": "^0.19.13",
+    "drizzle-zod": "^0.5.1",
+    "zod": "^3.21.4",
+    "zod-validation-error": "^1.5.0",
+    "nodemailer": "^6.9.7",
+    "@sendgrid/mail": "^7.7.0",
+    "node-mailjet": "^6.0.4",
+    "connect-pg-simple": "^9.0.1",
+    "memorystore": "^1.6.7",
+    "ws": "^8.14.2",
+    "uuid": "^9.0.0",
+    "multer": "^1.4.5-lts.1",
+    "archiver": "^6.0.1",
+    "exceljs": "^4.4.0",
+    "jspdf": "^2.5.1",
+    "pdfkit": "^0.13.0",
+    "node-cron": "^3.0.3",
+    "jsbarcode": "^3.11.5",
+    "chart.js": "^4.4.0",
+    "chartjs-node-canvas": "^4.1.6",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "date-fns": "^2.30.0",
+    "nanoid": "^4.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "@types/express": "^4.17.17",
+    "@types/express-session": "^1.17.7",
+    "@types/passport": "^1.0.12",
+    "@types/passport-local": "^1.0.35",
+    "@types/pg": "^8.10.2",
+    "@types/uuid": "^9.0.2",
+    "@types/multer": "^1.4.7",
+    "@types/archiver": "^6.0.2",
+    "@types/node-cron": "^3.0.8",
+    "@types/nodemailer": "^6.4.11",
+    "@types/pdfkit": "^0.12.9",
+    "@types/jspdf": "^2.3.0",
+    "@types/ws": "^8.5.5",
+    "typescript": "^5.2.2",
+    "tsx": "^3.12.7"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
